@@ -1,7 +1,6 @@
 import React, { useState } from 'react';
 import Link from 'next/link';
 import { Navbar, Footer } from '../../components/template';
-import { supabase } from '../../utils/supabase';
 
 export default function Register() {
   const [firstName, setFirstName] = useState('');
@@ -24,33 +23,23 @@ export default function Register() {
     }
 
     try {
-      const { data, error } = await supabase.auth.signUp({
-        email,
-        password,
-        options: {
-          data: {
-            first_name: firstName,
-            last_name: lastName,
-          }
-        }
+      const response = await fetch('/api/register', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          firstName,
+          lastName,
+          email,
+          password,
+        }),
       });
-      if (error) throw error;
 
-      // Insert into users table
-      const { data: profileData, error: profileError } = await supabase
-        .from('users')
-        .insert([
-          {
-            name: firstName,
-            last_name: lastName,
-            email: email,
-            password: password, // Note: Storing password in plain text is insecure; consider hashing
-          }
-        ]);
+      const data = await response.json();
 
-      if (profileError) {
-        console.error('Profile insert error:', profileError);
-        // Don't throw, as user is registered
+      if (!response.ok) {
+        throw new Error(data.error || 'Registration failed');
       }
 
       setMessage('Registration successful! Please check your email for verification.');
