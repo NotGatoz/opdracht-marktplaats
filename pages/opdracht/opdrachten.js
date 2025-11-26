@@ -1,21 +1,18 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { Navbar, Footer } from '../../components/template';
 
 export default function OpdrachtenPage() {
   const [opdrachten, setOpdrachten] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
+  const [selectedOpdracht, setSelectedOpdracht] = useState(null);
 
   useEffect(() => {
     const fetchOpdrachten = async () => {
       try {
-        const res = await fetch('/api/opdracht/opdrachten');
+        const res = await fetch('/api/opdracht/opdrachten'); // Make sure API path is correct
         const data = await res.json();
-
-        if (!res.ok) {
-          throw new Error(data.error || 'Fout bij ophalen opdrachten');
-        }
-
+        if (!res.ok) throw new Error(data.error || 'Fout bij ophalen opdrachten');
         setOpdrachten(data.opdrachten);
       } catch (err) {
         setError(err.message);
@@ -31,37 +28,87 @@ export default function OpdrachtenPage() {
     <div className="theme-l5" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <Navbar />
 
-      <div style={{ flex: 1, padding: '2rem', maxWidth: '900px', margin: '0 auto' }}>
-        <h1 style={{ fontSize: '2rem', marginBottom: '1.5rem' }}>Alle Opdrachten</h1>
+      <div style={{ flex: 1, padding: '2rem' }}>
+        <h1>Opdrachten</h1>
 
-        {loading && <p>Loading...</p>}
+        {loading && <p>Laden...</p>}
         {error && <p style={{ color: 'red' }}>{error}</p>}
-        {!loading && !error && opdrachten.length === 0 && <p>Er zijn nog geen opdrachten geplaatst.</p>}
 
-        {!loading && opdrachten.length > 0 && (
-          <div style={{ display: 'flex', flexDirection: 'column', gap: '1rem' }}>
-            {opdrachten.map((opdracht) => (
-              <div
-                key={opdracht.id}
-                className="card round white"
-                style={{ padding: '1rem', boxShadow: '0 2px 6px rgba(0,0,0,0.1)' }}
-              >
-                <h3>{opdracht.title}</h3>
-                <p><b>Categorie:</b> {opdracht.category || 'Niet gespecificeerd'}</p>
-                <p><b>Prijs:</b> €{opdracht.price}</p>
-                <p><b>Deadline:</b> {new Date(opdracht.deadline).toLocaleDateString()}</p>
-                {opdracht.location && <p><b>Locatie:</b> {opdracht.location}</p>}
-                <p style={{ fontSize: '0.85rem', color: '#666' }}>
-                  Gepubliceerd: {new Date(opdracht.created_at).toLocaleString()}
-                </p>
-                <p><b>Status:</b> {opdracht.status}</p>
-              </div>
-            ))}
-          </div>
-        )}
+        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem' }}>
+          {opdrachten.map((opdracht) => (
+            <div
+              key={opdracht.id}
+              className="card round white"
+              style={{ padding: '1rem', cursor: 'pointer' }}
+              onClick={() => setSelectedOpdracht(opdracht)}
+            >
+              <h3>{opdracht.title}</h3>
+              <p>{opdracht.description.substring(0, 80)}...</p>
+              <p>Prijs: €{opdracht.price}</p>
+              <p>Status: {opdracht.status}</p>
+            </div>
+          ))}
+        </div>
       </div>
 
       <Footer />
+
+      {/* Modal */}
+      {selectedOpdracht && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 1000,
+          }}
+          onClick={() => setSelectedOpdracht(null)} // click outside closes modal
+        >
+          <div
+            onClick={(e) => e.stopPropagation()} // prevent closing when clicking inside
+            style={{
+              backgroundColor: 'white',
+              borderRadius: '8px',
+              maxWidth: '600px',
+              width: '90%',
+              padding: '2rem',
+              position: 'relative',
+            }}
+          >
+            <button
+              onClick={() => setSelectedOpdracht(null)}
+              style={{
+                position: 'absolute',
+                top: '10px',
+                right: '10px',
+                background: 'red',
+                color: 'white',
+                border: 'none',
+                padding: '0.5rem 1rem',
+                borderRadius: '4px',
+                cursor: 'pointer',
+              }}
+            >
+              Sluiten
+            </button>
+
+            <h2>{selectedOpdracht.title}</h2>
+            <p><strong>Beschrijving:</strong> {selectedOpdracht.description}</p>
+            <p><strong>Categorie:</strong> {selectedOpdracht.category || 'Geen'}</p>
+            <p><strong>Prijs:</strong> €{selectedOpdracht.price}</p>
+            <p><strong>Deadline:</strong> {new Date(selectedOpdracht.deadline).toLocaleDateString()}</p>
+            <p><strong>Locatie:</strong> {selectedOpdracht.location || 'Geen'}</p>
+            <p><strong>Status:</strong> {selectedOpdracht.status}</p>
+            <p><strong>Aangemaakt:</strong> {new Date(selectedOpdracht.created_at).toLocaleDateString()}</p>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

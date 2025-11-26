@@ -1,29 +1,62 @@
 import React, { useState, useEffect } from 'react';
-import Link from 'next/link';
 import { useRouter } from 'next/router';
 import { Navbar, Footer } from '../components/template';
 
-export default function Home() {
+export default function Dashboard() {
   const [userData, setUserData] = useState(null);
   const [checkingAuth, setCheckingAuth] = useState(true);
+  const [stats, setStats] = useState({
+    totalOpdrachten: 0,
+    completedOpdrachten: 0,
+    upcomingOpdrachten: [],
+  });
+  const [recentOpdrachten, setRecentOpdrachten] = useState([]);
+  const [loadingStats, setLoadingStats] = useState(true);
   const router = useRouter();
 
-  // Check if logged in, redirect to login if not
+  // Check if logged in
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       try {
-        setUserData(JSON.parse(storedUser));
+        const user = JSON.parse(storedUser);
+        setUserData(user);
         setCheckingAuth(false);
       } catch (err) {
         console.error('Error parsing stored user:', err);
         router.push('/auth/login');
       }
     } else {
-      // Not logged in, redirect to login
       router.push('/auth/login');
     }
   }, [router]);
+
+  // Fetch dashboard data
+  useEffect(() => {
+    const fetchStats = async () => {
+      if (!userData) return;
+
+      try {
+        const res = await fetch(`/api/dashboard?userId=${userData.id}`);
+        const data = await res.json();
+        if (!res.ok) throw new Error(data.error || 'Fout bij ophalen dashboard data');
+
+        setStats({
+          totalOpdrachten: data.totalOpdrachten,
+          completedOpdrachten: data.completedOpdrachten,
+          upcomingOpdrachten: data.upcomingOpdrachten,
+        });
+
+        setRecentOpdrachten(data.recentOpdrachten || []);
+      } catch (err) {
+        console.error('Dashboard fetch error:', err.message);
+      } finally {
+        setLoadingStats(false);
+      }
+    };
+
+    fetchStats();
+  }, [userData]);
 
   if (checkingAuth) {
     return (
@@ -77,10 +110,57 @@ export default function Home() {
           <br />
         </div>
 
-        {/* Page Container */}
-        <div className="container content" style={{ marginTop: '80px', marginLeft: '320px' }}>
-          <div className="row">
-            <h1>Welkom, {userData.name}!</h1>
+        {/* Dashboard Content */}
+        <div className="container content" style={{ marginTop: '20px', marginLeft: '320px', flex: 1 }}>
+          <h1>Welkom, {userData.name}!</h1>
+
+          {/* Stats */}
+          {loadingStats ? (
+            <p>Laden...</p>
+          ) : (
+            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginTop: '1rem' }}>
+              <div className="card round white" style={{ flex: 1, minWidth: '200px', padding: '1rem' }}>
+                <h3>Totaal opdrachten</h3>
+                <p style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>{stats.totalOpdrachten}</p>
+              </div>
+              <div className="card round white" style={{ flex: 1, minWidth: '200px', padding: '1rem' }}>
+                <h3>Voltooide opdrachten</h3>
+                <p style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>{stats.completedOpdrachten}</p>
+              </div>
+              <div className="card round white" style={{ flex: 2, minWidth: '300px', padding: '1rem' }}>
+                <h3>Aanstaande deadlines</h3>
+                {stats.upcomingOpdrachten.length === 0 ? (
+                  <p>Geen aanstaande opdrachten</p>
+                ) : (
+                  <ul>
+                    {stats.upcomingOpdrachten.map((o) => (
+                      <li key={o.id}>
+                        {o.title} - {new Date(o.deadline).toLocaleDateString('nl-NL')}
+                      </li>
+                    ))}
+                  </ul>
+                )}
+              </div>
+            </div>
+          )}
+
+          {/* Recent opdrachten */}
+          <div style={{ marginTop: '2rem' }}>
+            <h2>Recente opdrachten</h2>
+            {recentOpdrachten.length === 0 ? (
+              <p>Geen recente opdrachten</p>
+            ) : (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem' }}>
+                {recentOpdrachten.map((op) => (
+                  <div key={op.id} className="card round white" style={{ padding: '1rem' }}>
+                    <h4>{op.title}</h4>
+                    <p>{op.description.substring(0, 80)}...</p>
+                    <p>Status: {op.status}</p>
+                    <p>Deadline: {new Date(op.deadline).toLocaleDateString('nl-NL')}</p>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         </div>
       </div>
