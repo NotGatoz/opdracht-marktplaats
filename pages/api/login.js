@@ -1,4 +1,5 @@
-import { supabase } from '../../utils/supabase';
+import { pool } from '../../lib/db';
+import bcrypt from 'bcryptjs';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') {
@@ -6,24 +7,27 @@ export default async function handler(req, res) {
   }
 
   const { email, password } = req.body;
-
   if (!email || !password) {
     return res.status(400).json({ error: 'Email and password are required' });
   }
 
   try {
-    const { data, error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-
-    if (error) {
-      throw error;
+    const result = await pool.query('SELECT id, name, email, password, created_at FROM users WHERE email = $1', [email]);
+    const user = result.rows[0];
+    if (!user) {
+      return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    res.status(200).json({ message: 'Login successful', session: data.session, user: data.user });
-  } catch (error) {
-    console.error('Error during login:', error);
-    res.status(401).json({ error: error.message || 'Invalid credentials' });
+    const match = await bcrypt.compare(password, user.password);
+    if (!match) {
+      return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    // don't send password back
+    const { password: _pw, ...userSafe } = user;
+    res.status(200).json({ message: 'Login successful', user: userSafe });
+  } catch (err) {
+    console.error('Error during login:', err && err.message ? err.message : err);
+    res.status(500).json({ error: 'Internal server error' });
   }
 }

@@ -1,4 +1,5 @@
 import { pool } from "../../lib/db";
+import bcrypt from 'bcryptjs';
 
 export default async function handler(req, res) {
   if (req.method !== "POST") {
@@ -12,12 +13,22 @@ export default async function handler(req, res) {
   }
 
   try {
+    // check if user exists
+    const exists = await pool.query('SELECT id FROM users WHERE email = $1', [email]);
+    if (exists.rows.length > 0) {
+      return res.status(409).json({ error: 'User already exists' });
+    }
+
+    // hash the password
+    const salt = await bcrypt.genSalt(10);
+    const hashed = await bcrypt.hash(password, salt);
     const result = await pool.query(
-      `INSERT INTO users (first_name, last_name, email, password)
-       VALUES ($1, $2, $3, $4)
-       RETURNING id`,
-      [firstName, lastName, email, password]
+      `INSERT INTO users (name, email, password, created_at)
+      VALUES ($1, $2, $3, NOW())
+      RETURNING id`,
+      [firstName + ' ' + lastName, email, hashed]
     );
+
 
     res.status(201).json({
       message: "User registered successfully",

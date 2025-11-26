@@ -1,6 +1,5 @@
 import { useState } from 'react';
 import Link from 'next/link';
-import { supabase } from '../../utils/supabase';
 import { useRouter } from 'next/router';
 import { Navbar, Footer } from '../../components/template';
 
@@ -13,14 +12,17 @@ export default function Login() {
   const handleLogin = async (e) => {
     e.preventDefault();
     setLoading(true);
-    const { error } = await supabase.auth.signInWithPassword({
-      email,
-      password,
-    });
-    if (error) {
-      alert(error.message);
-    } else {
+    try {
+      const res = await fetch('/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email, password }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Login failed');
       router.push('/');
+    } catch (err) {
+      alert(err.message || 'Login failed');
     }
     setLoading(false);
   };
