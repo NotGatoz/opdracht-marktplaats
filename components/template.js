@@ -18,13 +18,31 @@ export function Navbar() {
 
   return (
     <div className="top">
-        <div className="bar theme-d2" style={{display: 'flex', justifyContent: 'space-between'}}>
+      <div className="bar theme-d2" style={{ display: 'flex', justifyContent: 'space-between' }}>
         <div>
-          <Link href="/" className="bar-item button small padding-small theme-d4"><i className="fa fa-home margin-right"></i>Startpagina</Link>
-          <Link href="/opdracht/post" className="bar-item button small padding-small theme-d4"><i className="fa fa-plus margin-right"></i>Opdracht Plaatsen</Link>
-          {isAdmin && <Link href="/admin/panel" className="bar-item button small padding-small theme-d4"><i className="fa fa-cog margin-right"></i>Beheer</Link>}
+          {/* Absolute paths */}
+          <Link href="/" className="bar-item button small padding-small theme-d4">
+            <i className="fa fa-home margin-right"></i>Startpagina
+          </Link>
+
+          <Link href="/opdracht/post" className="bar-item button small padding-small theme-d4">
+            <i className="fa fa-plus margin-right"></i>Opdracht Plaatsen
+          </Link>
+
+          <Link href="/opdracht/opdrachten" className="bar-item button small padding-small theme-d4">
+            <i className="fa fa-list margin-right"></i>Opdrachten
+          </Link>
+
+          {isAdmin && (
+            <Link href="/admin/panel" className="bar-item button small padding-small theme-d4">
+              <i className="fa fa-cog margin-right"></i>Beheer
+            </Link>
+          )}
         </div>
-        <a href="#" className="bar-item button small hide-small padding-small hover-white"><i className="fa fa-user"></i> Account</a>
+
+        <a href="#" className="bar-item button small hide-small padding-small hover-white">
+          <i className="fa fa-user"></i> Account
+        </a>
       </div>
     </div>
   );
