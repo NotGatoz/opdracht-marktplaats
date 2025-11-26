@@ -2,38 +2,41 @@ import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 
 export function Navbar() {
-  const [isAdmin, setIsAdmin] = useState(false);
+  const [user, setUser] = useState(null);
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       try {
-        const userData = JSON.parse(storedUser);
-        setIsAdmin(userData.is_admin);
+        const parsed = JSON.parse(storedUser);
+        setUser(parsed);
       } catch (err) {
-        console.error('Error parsing user:', err);
+        console.error('Error parsing user from localStorage:', err);
       }
     }
   }, []);
+
+  const canPost = user?.is_admin || user?.is_poster;
 
   return (
     <div className="top">
       <div className="bar theme-d2" style={{ display: 'flex', justifyContent: 'space-between' }}>
         <div>
-          {/* Absolute paths */}
           <Link href="/" className="bar-item button small padding-small theme-d4">
             <i className="fa fa-home margin-right"></i>Startpagina
           </Link>
 
-          <Link href="/opdracht/post" className="bar-item button small padding-small theme-d4">
-            <i className="fa fa-plus margin-right"></i>Opdracht Plaatsen
-          </Link>
+          {canPost && (
+            <Link href="/opdracht/post" className="bar-item button small padding-small theme-d4">
+              <i className="fa fa-plus margin-right"></i>Opdracht Plaatsen
+            </Link>
+          )}
 
           <Link href="/opdracht/opdrachten" className="bar-item button small padding-small theme-d4">
             <i className="fa fa-list margin-right"></i>Opdrachten
           </Link>
 
-          {isAdmin && (
+          {user?.is_admin && (
             <Link href="/admin/panel" className="bar-item button small padding-small theme-d4">
               <i className="fa fa-cog margin-right"></i>Beheer
             </Link>

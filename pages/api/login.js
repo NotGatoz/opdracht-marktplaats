@@ -12,7 +12,12 @@ export default async function handler(req, res) {
   }
 
   try {
-    const result = await pool.query('SELECT id, name, last_name, email, password, is_admin, status, created_at FROM users WHERE email = $1', [email]);
+    // Include is_poster in the SELECT
+    const result = await pool.query(
+      'SELECT id, name, last_name, email, password, is_admin, is_poster, status, created_at FROM users WHERE email = $1',
+      [email]
+    );
+
     const user = result.rows[0];
     if (!user) {
       return res.status(401).json({ error: 'Invalid credentials' });
@@ -28,8 +33,10 @@ export default async function handler(req, res) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
-    // don't send password back
+    // Remove password before sending back
     const { password: _pw, ...userSafe } = user;
+
+    // Now userSafe includes is_poster
     res.status(200).json({ message: 'Login successful', user: userSafe });
   } catch (err) {
     console.error('Error during login:', err && err.message ? err.message : err);

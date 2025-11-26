@@ -21,21 +21,28 @@ export default function PostOpdracht() {
   const [imagePreview, setImagePreview] = useState('/images/placeholder.png');
 
   // Check if logged in
-  useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      try {
-        const userData = JSON.parse(storedUser);
-        setUser(userData);
-        setCheckingAuth(false);
-      } catch (err) {
-        console.error('Error parsing user:', err);
-        router.push('/auth/login');
+useEffect(() => {
+  const storedUser = localStorage.getItem('user');
+  if (storedUser) {
+    try {
+      const userData = JSON.parse(storedUser);
+      setUser(userData);
+
+      // Only allow users with is_poster or is_admin
+      if (!userData.is_poster && !userData.is_admin) {
+        router.replace('/'); // redirect to homepage
+        return;
       }
-    } else {
-      router.push('/auth/login');
+
+      setCheckingAuth(false);
+    } catch (err) {
+      console.error('Error parsing user:', err);
+      router.replace('/auth/login');
     }
-  }, [router]);
+  } else {
+    router.replace('/auth/login');
+  }
+}, [router]);
 
   const handleChange = (e) => {
     const { name, value } = e.target;
