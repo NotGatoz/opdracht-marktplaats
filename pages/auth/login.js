@@ -20,6 +20,8 @@ export default function Login() {
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Login failed');
+      // Store user in localStorage
+      localStorage.setItem('user', JSON.stringify(data.user));
       router.push('/');
     } catch (err) {
       alert(err.message || 'Login failed');

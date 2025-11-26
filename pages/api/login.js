@@ -12,7 +12,7 @@ export default async function handler(req, res) {
   }
 
   try {
-    const result = await pool.query('SELECT id, name, email, password, created_at FROM users WHERE email = $1', [email]);
+    const result = await pool.query('SELECT id, name, last_name, email, password, created_at FROM users WHERE email = $1', [email]);
     const user = result.rows[0];
     if (!user) {
       return res.status(401).json({ error: 'Invalid credentials' });

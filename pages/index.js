@@ -5,20 +5,16 @@ import { Navbar, Footer } from '../components/template';
 export default function Home() {
   const [userData, setUserData] = useState(null);
 
-  // Fetch current user from your API
+  // Fetch current user from localStorage
   useEffect(() => {
-    const fetchUser = async () => {
+    const storedUser = localStorage.getItem('user');
+    if (storedUser) {
       try {
-        const res = await fetch('/api/current-user');
-        if (!res.ok) return;
-        const data = await res.json();
-        if (data.user) setUserData(data.user);
+        setUserData(JSON.parse(storedUser));
       } catch (err) {
-        console.error('Error fetching current user:', err);
+        console.error('Error parsing stored user:', err);
       }
-    };
-
-    fetchUser();
+    }
   }, []);
 
   return (
@@ -43,13 +39,16 @@ export default function Home() {
                   </p>
                   <hr />
                   <p>ID: {userData.id}</p>
-                  <p>{userData.name}</p>
+                  <p>
+                    {userData.name} {userData.last_name}
+                  </p>
                   <p>Email: {userData.email}</p>
                   <p>Joined {new Date(userData.created_at).toLocaleDateString()}</p>
                   <button
                     className="button block theme-l1"
                     onClick={async () => {
                       await fetch('/api/logout', { method: 'POST' });
+                      localStorage.removeItem('user');
                       setUserData(null);
                     }}
                   >
