@@ -1,46 +1,30 @@
-import { createClient } from '@supabase/supabase-js';
-
-const supabaseUrl = 'https://inicfjsfdwcrpjjhhnzz.supabase.co';
-const supabaseServiceKey = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImluaWNmanNmZHdjcnBqamhobnp6Iiwicm9sZSI6InNlcnZpY2Vfcm9sZSIsImlhdCI6MTc2MzUxODQzNywiZXhwIjoyMDc5MDk0NDM3fQ.svicYnIGtT-cZp428xQPFboITfQ5GVWDpz_XXaVqxvM';
-
-const supabase = createClient(supabaseUrl, supabaseServiceKey);
+import { pool } from "../../lib/db";
 
 export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' });
+  if (req.method !== "POST") {
+    return res.status(405).json({ error: "Method not allowed" });
   }
 
   const { firstName, lastName, email, password } = req.body;
 
-  console.log('Register API called with:', { firstName, lastName, email, password: '***' });
-
   if (!firstName || !lastName || !email || !password) {
-    console.log('Missing fields');
-    return res.status(400).json({ error: 'All fields are required' });
+    return res.status(400).json({ error: "All fields are required" });
   }
 
   try {
-    console.log('Attempting insert into users table');
-    const { error: insertError } = await supabase
-      .from('users')
-      .insert([
-        {
-          name: firstName,
-          last_name: lastName,
-          email,
-          password, // Note: Storing password in plain text is insecure; consider hashing
-        },
-      ]);
+    const result = await pool.query(
+      `INSERT INTO users (first_name, last_name, email, password)
+       VALUES ($1, $2, $3, $4)
+       RETURNING id`,
+      [firstName, lastName, email, password]
+    );
 
-    if (insertError) {
-      console.log('Insert error:', insertError);
-      return res.status(400).json({ error: insertError.message });
-    }
-
-    console.log('Insert successful');
-    res.status(200).json({ message: 'Registration successful' });
+    res.status(201).json({
+      message: "User registered successfully",
+      userId: result.rows[0].id,
+    });
   } catch (error) {
-    console.log('Unexpected error:', error);
-    res.status(500).json({ error: 'Internal server error' });
+    console.error("Error inserting user:", error);
+    res.status(500).json({ error: "Internal server error" });
   }
 }
