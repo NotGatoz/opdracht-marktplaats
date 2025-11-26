@@ -8,29 +8,34 @@ export function Navbar() {
     const storedUser = localStorage.getItem('user');
     if (storedUser) {
       try {
-        const parsed = JSON.parse(storedUser);
-        setUser(parsed);
+        const userData = JSON.parse(storedUser);
+        setUser(userData);
       } catch (err) {
-        console.error('Error parsing user from localStorage:', err);
+        console.error('Error parsing user:', err);
       }
     }
   }, []);
 
-  const canPost = user?.is_admin || user?.is_poster;
+  const showMijnOpdrachten = user && (user.is_admin || user.is_poster);
 
   return (
     <div className="top">
       <div className="bar theme-d2" style={{ display: 'flex', justifyContent: 'space-between' }}>
         <div>
+          {/* Absolute paths */}
           <Link href="/" className="bar-item button small padding-small theme-d4">
             <i className="fa fa-home margin-right"></i>Startpagina
           </Link>
 
-          {canPost && (
-            <Link href="/opdracht/post" className="bar-item button small padding-small theme-d4">
-              <i className="fa fa-plus margin-right"></i>Opdracht Plaatsen
+          {showMijnOpdrachten && (
+            <Link href="/opdracht/mijn-opdrachten" className="bar-item button small padding-small theme-d4">
+              <i className="fa fa-list-alt margin-right"></i>Mijn Geplaatste Opdrachten
             </Link>
           )}
+
+          <Link href="/opdracht/post" className="bar-item button small padding-small theme-d4">
+            <i className="fa fa-plus margin-right"></i>Opdracht Plaatsen
+          </Link>
 
           <Link href="/opdracht/opdrachten" className="bar-item button small padding-small theme-d4">
             <i className="fa fa-list margin-right"></i>Opdrachten
