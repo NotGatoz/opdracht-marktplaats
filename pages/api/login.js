@@ -12,10 +12,15 @@ export default async function handler(req, res) {
   }
 
   try {
-    const result = await pool.query('SELECT id, name, last_name, email, password, created_at FROM users WHERE email = $1', [email]);
+    const result = await pool.query('SELECT id, name, last_name, email, password, is_admin, status, created_at FROM users WHERE email = $1', [email]);
     const user = result.rows[0];
     if (!user) {
       return res.status(401).json({ error: 'Invalid credentials' });
+    }
+
+    // Check if user is approved
+    if (user.status !== 'approved') {
+      return res.status(403).json({ error: 'Your account is pending admin approval. Please wait.' });
     }
 
     const match = await bcrypt.compare(password, user.password);

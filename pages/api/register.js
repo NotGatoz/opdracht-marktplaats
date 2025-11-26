@@ -23,10 +23,10 @@ export default async function handler(req, res) {
     const salt = await bcrypt.genSalt(10);
     const hashed = await bcrypt.hash(password, salt);
     const result = await pool.query(
-      `INSERT INTO users (name, last_name, email, password, created_at)
-      VALUES ($1, $2, $3, $4, NOW())
+      `INSERT INTO users (name, last_name, email, password, status, created_at)
+      VALUES ($1, $2, $3, $4, $5, NOW())
       RETURNING id`,
-      [firstName, lastName, email, hashed]
+      [firstName, lastName, email, hashed, 'pending']
     );
 
 
