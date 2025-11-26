@@ -14,22 +14,33 @@ export default function Dashboard() {
   const [loadingStats, setLoadingStats] = useState(true);
   const router = useRouter();
 
-  // Check if logged in
-  useEffect(() => {
-    const storedUser = localStorage.getItem('user');
-    if (storedUser) {
-      try {
-        const user = JSON.parse(storedUser);
-        setUserData(user);
-        setCheckingAuth(false);
-      } catch (err) {
-        console.error('Error parsing stored user:', err);
-        router.push('/auth/login');
+useEffect(() => {
+  const storedUser = localStorage.getItem('user');
+
+  if (storedUser) {
+    try {
+      const parsed = JSON.parse(storedUser);
+
+      // --------------------------------------------------
+      // 🔍 Set is_poster → true or null
+      // --------------------------------------------------
+      if (parsed.is_poster === true) {
+        parsed.is_poster = true;
+      } else {
+        parsed.is_poster = null;
       }
-    } else {
+      // --------------------------------------------------
+
+      setUserData(parsed);
+      setCheckingAuth(false);
+    } catch (err) {
+      console.error('Error parsing stored user:', err);
       router.push('/auth/login');
     }
-  }, [router]);
+  } else {
+    router.push('/auth/login');
+  }
+}, [router]);
 
   // Fetch dashboard data
   useEffect(() => {

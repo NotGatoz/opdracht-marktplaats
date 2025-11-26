@@ -58,6 +58,27 @@ export default function AdminPanel() {
       setLoading(false);
     }
   };
+  const handlePosterRole = async (userId, makePoster) => {
+    setActionLoading(userId);
+    try {
+        const res = await fetch('/api/admin/user-action', {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+            action: 'changePosterRole',
+            userId,
+            isPoster: makePoster
+        }),
+        });
+
+        if (!res.ok) throw new Error('Failed to update poster role');
+        await fetchUsers(); // refresh user list
+    } catch (err) {
+        alert(err.message);
+    } finally {
+        setActionLoading(null);
+    }
+  };
 
   const handleUserAction = async (userId, action) => {
     setActionLoading(userId);
@@ -254,86 +275,108 @@ export default function AdminPanel() {
                       <td style={{ padding: '1rem', textAlign: 'center', color: '#999', fontSize: '0.9rem' }}>
                         {new Date(u.created_at).toLocaleDateString('nl-NL')}
                       </td>
-                      <td style={{ padding: '1rem', textAlign: 'center' }}>
+                        <td style={{ padding: '1rem', textAlign: 'center' }}>
                         <div style={{ display: 'flex', gap: '0.5rem', justifyContent: 'center', flexWrap: 'wrap' }}>
-                          {u.status === 'pending' && (
+                            {u.status === 'pending' && (
                             <>
-                              <button
+                                <button
                                 onClick={() => handleUserAction(u.id, 'approve')}
                                 disabled={actionLoading === u.id}
                                 style={{
-                                  padding: '0.4rem 0.8rem',
-                                  fontSize: '0.8rem',
-                                  border: 'none',
-                                  borderRadius: '4px',
-                                  backgroundColor: '#51cf66',
-                                  color: 'white',
-                                  cursor: 'pointer',
-                                  fontWeight: 'bold',
-                                  opacity: actionLoading === u.id ? 0.6 : 1,
+                                    padding: '0.4rem 0.8rem',
+                                    fontSize: '0.8rem',
+                                    border: 'none',
+                                    borderRadius: '4px',
+                                    backgroundColor: '#51cf66',
+                                    color: 'white',
+                                    cursor: 'pointer',
+                                    fontWeight: 'bold',
+                                    opacity: actionLoading === u.id ? 0.6 : 1,
                                 }}
-                              >
+                                >
                                 ✓ Goedkeuren
-                              </button>
-                              <button
+                                </button>
+                                <button
                                 onClick={() => handleUserAction(u.id, 'reject')}
                                 disabled={actionLoading === u.id}
                                 style={{
-                                  padding: '0.4rem 0.8rem',
-                                  fontSize: '0.8rem',
-                                  border: 'none',
-                                  borderRadius: '4px',
-                                  backgroundColor: '#ff6b6b',
-                                  color: 'white',
-                                  cursor: 'pointer',
-                                  fontWeight: 'bold',
-                                  opacity: actionLoading === u.id ? 0.6 : 1,
+                                    padding: '0.4rem 0.8rem',
+                                    fontSize: '0.8rem',
+                                    border: 'none',
+                                    borderRadius: '4px',
+                                    backgroundColor: '#ff6b6b',
+                                    color: 'white',
+                                    cursor: 'pointer',
+                                    fontWeight: 'bold',
+                                    opacity: actionLoading === u.id ? 0.6 : 1,
                                 }}
-                              >
+                                >
                                 ✗ Afwijzen
-                              </button>
+                                </button>
                             </>
-                          )}
-                          <button
+                            )}
+
+                            {/* Poster role button only for approved users */}
+                            {u.status === 'approved' && (
+                            <button
+                                onClick={() => handlePosterRole(u.id, !u.is_poster)}
+                                disabled={actionLoading === u.id}
+                                style={{
+                                padding: '0.4rem 0.8rem',
+                                fontSize: '0.8rem',
+                                border: '2px solid #0066cc',
+                                borderRadius: '4px',
+                                backgroundColor: u.is_poster ? '#51cf66' : 'transparent',
+                                color: u.is_poster ? 'white' : '#0066cc',
+                                cursor: 'pointer',
+                                fontWeight: 'bold',
+                                opacity: actionLoading === u.id ? 0.6 : 1,
+                                }}
+                            >
+                                {u.is_poster ? '❌ Remove Poster' : '➕ Make Poster'}
+                            </button>
+                            )}
+                            
+                            <button
                             onClick={() => handleUserAction(u.id, 'toggle-admin')}
                             disabled={actionLoading === u.id}
                             style={{
-                              padding: '0.4rem 0.8rem',
-                              fontSize: '0.8rem',
-                              border: '2px solid #ff6b6b',
-                              borderRadius: '4px',
-                              backgroundColor: 'transparent',
-                              color: '#ff6b6b',
-                              cursor: 'pointer',
-                              fontWeight: 'bold',
-                              opacity: actionLoading === u.id ? 0.6 : 1,
+                                padding: '0.4rem 0.8rem',
+                                fontSize: '0.8rem',
+                                border: '2px solid #ff6b6b',
+                                borderRadius: '4px',
+                                backgroundColor: 'transparent',
+                                color: '#ff6b6b',
+                                cursor: 'pointer',
+                                fontWeight: 'bold',
+                                opacity: actionLoading === u.id ? 0.6 : 1,
                             }}
-                          >
+                            >
                             {u.is_admin ? '👤 Gebruiker' : '👑 Beheerder'}
-                          </button>
-                          <button
+                            </button>
+                            <button
                             onClick={() => {
-                              if (confirm(`Verwijder ${u.name}? Dit kan niet ongedaan gemaakt worden.`)) {
+                                if (confirm(`Verwijder ${u.name}? Dit kan niet ongedaan gemaakt worden.`)) {
                                 handleUserAction(u.id, 'delete');
-                              }
+                                }
                             }}
                             disabled={actionLoading === u.id}
                             style={{
-                              padding: '0.4rem 0.8rem',
-                              fontSize: '0.8rem',
-                              border: 'none',
-                              borderRadius: '4px',
-                              backgroundColor: '#999',
-                              color: 'white',
-                              cursor: 'pointer',
-                              fontWeight: 'bold',
-                              opacity: actionLoading === u.id ? 0.6 : 1,
+                                padding: '0.4rem 0.8rem',
+                                fontSize: '0.8rem',
+                                border: 'none',
+                                borderRadius: '4px',
+                                backgroundColor: '#999',
+                                color: 'white',
+                                cursor: 'pointer',
+                                fontWeight: 'bold',
+                                opacity: actionLoading === u.id ? 0.6 : 1,
                             }}
-                          >
+                            >
                             🗑️ Verwijderen
-                          </button>
+                            </button>
                         </div>
-                      </td>
+                        </td>
                     </tr>
                   ))}
                 </tbody>
