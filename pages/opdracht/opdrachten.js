@@ -102,7 +102,7 @@ export default function OpdrachtenPage() {
             >
               <h3>{opdracht.title}</h3>
               <p>{opdracht.description.substring(0, 80)}...</p>
-              <p>Prijs: €{opdracht.price}</p>
+              <p>Deadline: {new Date(opdracht.deadline).toLocaleDateString()}</p>
               <p>Status: {opdracht.status}</p>
             </div>
           ))}
@@ -160,11 +160,49 @@ export default function OpdrachtenPage() {
             <h2>{selectedOpdracht.title}</h2>
             <p><strong>Beschrijving:</strong> {selectedOpdracht.description}</p>
             <p><strong>Categorie:</strong> {selectedOpdracht.category || 'Geen'}</p>
-            <p><strong>Prijs:</strong> €{selectedOpdracht.price}</p>
             <p><strong>Deadline:</strong> {new Date(selectedOpdracht.deadline).toLocaleDateString()}</p>
-            <p><strong>Locatie:</strong> {selectedOpdracht.location || 'Geen'}</p>
+            <p><strong>Locatie:</strong> {selectedOpdracht.location_city ? `${selectedOpdracht.location_city}, ${selectedOpdracht.location_address}, ${selectedOpdracht.location_postcode}` : 'Geen'}</p>
             <p><strong>Status:</strong> {selectedOpdracht.status}</p>
             <p><strong>Aangemaakt:</strong> {new Date(selectedOpdracht.created_at).toLocaleDateString()}</p>
+
+            <h3>Verwachtte Opbouw Tijd</h3>
+            <p><strong>Datums:</strong> {selectedOpdracht.verwachtte_opbouw_tijd_datums || 'Niet opgegeven'}</p>
+            <p><strong>Uren:</strong> {selectedOpdracht.verwachtte_opbouw_tijd_uren || 'Niet opgegeven'}</p>
+
+            <h3>Opbouw</h3>
+            <p><strong>Hard Opbouw:</strong> {selectedOpdracht.hard_opbouw || 'Niet opgegeven'}</p>
+            <p><strong>Dagen Aantal:</strong> {selectedOpdracht.opbouw_dagen_amount || 'Niet opgegeven'}</p>
+            <p><strong>Mannen Nodig:</strong> {selectedOpdracht.opbouw_men_needed || 'Niet opgegeven'}</p>
+            <p><strong>Voorkeur:</strong> {selectedOpdracht.voorkeur_opbouw || 'Niet opgegeven'}</p>
+
+            <h3>Afbouw</h3>
+            <p><strong>Datum:</strong> {selectedOpdracht.planning_afbouw_date ? new Date(selectedOpdracht.planning_afbouw_date).toLocaleDateString() : 'Niet opgegeven'}</p>
+            <p><strong>Tijd:</strong> {selectedOpdracht.planning_afbouw_time || 'Niet opgegeven'}</p>
+            <p><strong>Hard Afbouw:</strong> {selectedOpdracht.hard_afbouw || 'Niet opgegeven'}</p>
+            <p><strong>Dagen Aantal:</strong> {selectedOpdracht.afbouw_dagen_amount || 'Niet opgegeven'}</p>
+            <p><strong>Mannen Nodig:</strong> {selectedOpdracht.afbouw_men_needed || 'Niet opgegeven'}</p>
+
+            <h3>Transport Opbouw</h3>
+            <p><strong>Type:</strong> {selectedOpdracht.opbouw_transport_type || 'Niet opgegeven'}</p>
+            <p><strong>Aantal:</strong> {selectedOpdracht.opbouw_transport_amount || 'Niet opgegeven'}</p>
+
+            <h3>Transport Afbouw</h3>
+            <p><strong>Type:</strong> {selectedOpdracht.afbouw_transport_type || 'Niet opgegeven'}</p>
+            <p><strong>Aantal:</strong> {selectedOpdracht.afbouw_transport_amount || 'Niet opgegeven'}</p>
+
+            <h3>Hoogwerkers Opbouw</h3>
+            <p><strong>Type:</strong> {selectedOpdracht.opbouw_hoogwerkers_type || 'Niet opgegeven'}</p>
+            <p><strong>Aantal:</strong> {selectedOpdracht.opbouw_hoogwerkers_amount || 'Niet opgegeven'}</p>
+
+            <h3>Hoogwerkers Afbouw</h3>
+            <p><strong>Type:</strong> {selectedOpdracht.afbouw_hoogwerkers_type || 'Niet opgegeven'}</p>
+            <p><strong>Aantal:</strong> {selectedOpdracht.afbouw_hoogwerkers_amount || 'Niet opgegeven'}</p>
+
+            <h3>Links en Opslag</h3>
+            <p><strong>Magazijnbon Link:</strong> {selectedOpdracht.magazijnbon_link ? <a href={selectedOpdracht.magazijnbon_link} target="_blank" rel="noopener noreferrer">Bekijk</a> : 'Niet opgegeven'}</p>
+            <p><strong>Project Map Opbouw Link:</strong> {selectedOpdracht.project_map_opbouw_link ? <a href={selectedOpdracht.project_map_opbouw_link} target="_blank" rel="noopener noreferrer">Bekijk</a> : 'Niet opgegeven'}</p>
+            <p><strong>Project Map Afbouw Link:</strong> {selectedOpdracht.project_map_afbouw_link ? <a href={selectedOpdracht.project_map_afbouw_link} target="_blank" rel="noopener noreferrer">Bekijk</a> : 'Niet opgegeven'}</p>
+            <p><strong>Storageplace Adres:</strong> {selectedOpdracht.storageplace_adres || 'Niet opgegeven'}</p>
 
             {!user?.is_poster && (
               <div style={{ marginTop: '1rem' }}>

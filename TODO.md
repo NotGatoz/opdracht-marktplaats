@@ -1,7 +1,4 @@
-# TODO for Session Management and Profile Display
+# TODO: Final Adjustments
 
-- [ ] Import useEffect, useState, and supabase in pages/index.js
-- [ ] Add state for user and userData
-- [ ] In useEffect, check auth state and fetch user data from users table if logged in
-- [ ] Update profile sidebar to display user credentials when logged in
-- [ ] Add logout functionality in navbar or profile
+- [ ] Step 1: Translate "Storageplace Adres" to Dutch "Opslagplaats Adres".
+- [ ] Step 2: Move "Beschrijving" field to the bottom of the form.

@@ -12,6 +12,7 @@ export default function Dashboard() {
   });
   const [recentOpdrachten, setRecentOpdrachten] = useState([]);
   const [loadingStats, setLoadingStats] = useState(true);
+  const [isPoster, setIsPoster] = useState(false);
   const router = useRouter();
 
 useEffect(() => {
@@ -59,6 +60,7 @@ useEffect(() => {
         });
 
         setRecentOpdrachten(data.recentOpdrachten || []);
+        setIsPoster(data.isPoster || false);
       } catch (err) {
         console.error('Dashboard fetch error:', err.message);
       } finally {
