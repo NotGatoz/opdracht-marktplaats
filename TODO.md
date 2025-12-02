@@ -1,10 +1,10 @@
-# TODO: Adjust opdrachten table and posting code
+# TODO: Implement Mijn Opdrachten Page
 
-- [x] Update schema.sql to match form field names (opbouw_date, opbouw_time, remove voorkeur_opbouw)
-- [x] Update API post.js INSERT columns to match new schema
-- [x] Update API post.js values array to use correct variables
-- [x] Update API opdrachten.js SELECT to use new field names
-- [x] Update frontend opdrachten.js to display new fields and remove old ones
-- [x] Restructure modal in opdrachten.js to match post form sections for professional look
-- [ ] Run the updated schema.sql in Supabase to recreate the table
-- [ ] Test posting from the form to ensure data is inserted correctly
+## Steps to Complete
+- [ ] Update pages/api/opdracht/mijn-opdrachten.js to use the same SELECT query as opdrachten.js, adding WHERE user_id = $1 for filtering.
+- [ ] Create pages/opdracht/mijn-opdrachten.js by copying opdrachten.js, with changes:
+  - Change h1 title to "Mijn Opdrachten".
+  - Update fetch URL to `/api/opdracht/mijn-opdrachten?userId=${user.id}`.
+  - Make fetchOpdrachten useEffect depend on user state.
+  - Bidding remains hidden for posters.
+- [ ] Verify the new page loads correctly and displays only the user's assignments.

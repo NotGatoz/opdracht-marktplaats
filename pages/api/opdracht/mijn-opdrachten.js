@@ -15,8 +15,8 @@ export default async function handler(req, res) {
     const result = await pool.query(`
       SELECT id, user_id, title, description, category, deadline,
         location_city, location_address, location_postcode,
-        verwachtte_opbouw_tijd_datums, verwachtte_opbouw_tijd_uren,
-        hard_opbouw, opbouw_dagen_amount, opbouw_men_needed, voorkeur_opbouw,
+        opbouw_date, opbouw_time,
+        hard_opbouw, opbouw_dagen_amount, opbouw_men_needed,
         planning_afbouw_date, planning_afbouw_time,
         hard_afbouw, afbouw_dagen_amount, afbouw_men_needed,
         opbouw_transport_type, opbouw_transport_amount,
