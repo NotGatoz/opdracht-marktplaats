@@ -61,7 +61,7 @@ export default function OpdrachtenPage() {
       const res = await fetch('/api/bids', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
+        body: JSONJSON.stringify({
           opdrachtId: selectedOpdracht.id,
           userId: user.id,
           amount: Number(newBid),
@@ -158,51 +158,80 @@ export default function OpdrachtenPage() {
             </button>
 
             <h2>{selectedOpdracht.title}</h2>
-            <p><strong>Beschrijving:</strong> {selectedOpdracht.description}</p>
-            <p><strong>Categorie:</strong> {selectedOpdracht.category || 'Geen'}</p>
-            <p><strong>Deadline:</strong> {new Date(selectedOpdracht.deadline).toLocaleDateString()}</p>
-            <p><strong>Locatie:</strong> {selectedOpdracht.location_city ? `${selectedOpdracht.location_city}, ${selectedOpdracht.location_address}, ${selectedOpdracht.location_postcode}` : 'Geen'}</p>
-            <p><strong>Status:</strong> {selectedOpdracht.status}</p>
-            <p><strong>Aangemaakt:</strong> {new Date(selectedOpdracht.created_at).toLocaleDateString()}</p>
 
-            <h3>Verwachtte Opbouw Tijd</h3>
-            <p><strong>Datums:</strong> {selectedOpdracht.verwachtte_opbouw_tijd_datums || 'Niet opgegeven'}</p>
-            <p><strong>Uren:</strong> {selectedOpdracht.verwachtte_opbouw_tijd_uren || 'Niet opgegeven'}</p>
+            <div style={{ marginBottom: '1rem' }}>
+              <h4 style={{ marginBottom: '0.5rem', color: '#333' }}>Basis Informatie</h4>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                <p><strong>Beschrijving:</strong> {selectedOpdracht.description}</p>
+                <p><strong>Categorie:</strong> {selectedOpdracht.category || 'Geen'}</p>
+                <p><strong>Deadline:</strong> {new Date(selectedOpdracht.deadline).toLocaleDateString()}</p>
+                <p><strong>Status:</strong> {selectedOpdracht.status}</p>
+                <p><strong>Aangemaakt:</strong> {new Date(selectedOpdracht.created_at).toLocaleDateString()}</p>
+              </div>
+            </div>
 
-            <h3>Opbouw</h3>
-            <p><strong>Hard Opbouw:</strong> {selectedOpdracht.hard_opbouw || 'Niet opgegeven'}</p>
-            <p><strong>Dagen Aantal:</strong> {selectedOpdracht.opbouw_dagen_amount || 'Niet opgegeven'}</p>
-            <p><strong>Mannen Nodig:</strong> {selectedOpdracht.opbouw_men_needed || 'Niet opgegeven'}</p>
-            <p><strong>Voorkeur:</strong> {selectedOpdracht.voorkeur_opbouw || 'Niet opgegeven'}</p>
+            <div style={{ marginBottom: '1rem' }}>
+              <h4 style={{ marginBottom: '0.5rem', color: '#333' }}>Locatie</h4>
+              <p><strong>Locatie:</strong> {selectedOpdracht.location_city ? `${selectedOpdracht.location_city}, ${selectedOpdracht.location_address}, ${selectedOpdracht.location_postcode}` : 'Geen'}</p>
+            </div>
 
-            <h3>Afbouw</h3>
-            <p><strong>Datum:</strong> {selectedOpdracht.planning_afbouw_date ? new Date(selectedOpdracht.planning_afbouw_date).toLocaleDateString() : 'Niet opgegeven'}</p>
-            <p><strong>Tijd:</strong> {selectedOpdracht.planning_afbouw_time || 'Niet opgegeven'}</p>
-            <p><strong>Hard Afbouw:</strong> {selectedOpdracht.hard_afbouw || 'Niet opgegeven'}</p>
-            <p><strong>Dagen Aantal:</strong> {selectedOpdracht.afbouw_dagen_amount || 'Niet opgegeven'}</p>
-            <p><strong>Mannen Nodig:</strong> {selectedOpdracht.afbouw_men_needed || 'Niet opgegeven'}</p>
+            <div style={{ marginBottom: '1rem' }}>
+              <h4 style={{ marginBottom: '0.5rem', color: '#333' }}>Opbouw Tijd</h4>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                <p><strong>Datum:</strong> {selectedOpdracht.opbouw_date ? new Date(selectedOpdracht.opbouw_date).toLocaleDateString() : 'Niet opgegeven'}</p>
+                <p><strong>Tijd:</strong> {selectedOpdracht.opbouw_time || 'Niet opgegeven'}</p>
+              </div>
+            </div>
 
-            <h3>Transport Opbouw</h3>
-            <p><strong>Type:</strong> {selectedOpdracht.opbouw_transport_type || 'Niet opgegeven'}</p>
-            <p><strong>Aantal:</strong> {selectedOpdracht.opbouw_transport_amount || 'Niet opgegeven'}</p>
+            <div style={{ marginBottom: '1rem' }}>
+              <h4 style={{ marginBottom: '0.5rem', color: '#333' }}>Opbouw Details</h4>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                <p><strong>Hard Opbouw:</strong> {selectedOpdracht.hard_opbouw || 'Niet opgegeven'}</p>
+                <p><strong>Dagen Aantal:</strong> {selectedOpdracht.opbouw_dagen_amount || 'Niet opgegeven'}</p>
+                <p><strong>Mannen Nodig:</strong> {selectedOpdracht.opbouw_men_needed || 'Niet opgegeven'}</p>
+              </div>
+            </div>
 
-            <h3>Transport Afbouw</h3>
-            <p><strong>Type:</strong> {selectedOpdracht.afbouw_transport_type || 'Niet opgegeven'}</p>
-            <p><strong>Aantal:</strong> {selectedOpdracht.afbouw_transport_amount || 'Niet opgegeven'}</p>
+            <div style={{ marginBottom: '1rem' }}>
+              <h4 style={{ marginBottom: '0.5rem', color: '#333' }}>Afbouw Details</h4>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                <p><strong>Datum:</strong> {selectedOpdracht.planning_afbouw_date ? new Date(selectedOpdracht.planning_afbouw_date).toLocaleDateString() : 'Niet opgegeven'}</p>
+                <p><strong>Tijd:</strong> {selectedOpdracht.planning_afbouw_time || 'Niet opgegeven'}</p>
+                <p><strong>Hard Afbouw:</strong> {selectedOpdracht.hard_afbouw || 'Niet opgegeven'}</p>
+                <p><strong>Dagen Aantal:</strong> {selectedOpdracht.afbouw_dagen_amount || 'Niet opgegeven'}</p>
+                <p><strong>Mannen Nodig:</strong> {selectedOpdracht.afbouw_men_needed || 'Niet opgegeven'}</p>
+              </div>
+            </div>
 
-            <h3>Hoogwerkers Opbouw</h3>
-            <p><strong>Type:</strong> {selectedOpdracht.opbouw_hoogwerkers_type || 'Niet opgegeven'}</p>
-            <p><strong>Aantal:</strong> {selectedOpdracht.opbouw_hoogwerkers_amount || 'Niet opgegeven'}</p>
+            <div style={{ marginBottom: '1rem' }}>
+              <h4 style={{ marginBottom: '0.5rem', color: '#333' }}>Transport</h4>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                <p><strong>Opbouw Type:</strong> {selectedOpdracht.opbouw_transport_type || 'Niet opgegeven'}</p>
+                <p><strong>Opbouw Aantal:</strong> {selectedOpdracht.opbouw_transport_amount || 'Niet opgegeven'}</p>
+                <p><strong>Afbouw Type:</strong> {selectedOpdracht.afbouw_transport_type || 'Niet opgegeven'}</p>
+                <p><strong>Afbouw Aantal:</strong> {selectedOpdracht.afbouw_transport_amount || 'Niet opgegeven'}</p>
+              </div>
+            </div>
 
-            <h3>Hoogwerkers Afbouw</h3>
-            <p><strong>Type:</strong> {selectedOpdracht.afbouw_hoogwerkers_type || 'Niet opgegeven'}</p>
-            <p><strong>Aantal:</strong> {selectedOpdracht.afbouw_hoogwerkers_amount || 'Niet opgegeven'}</p>
+            <div style={{ marginBottom: '1rem' }}>
+              <h4 style={{ marginBottom: '0.5rem', color: '#333' }}>Hoogwerkers</h4>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                <p><strong>Opbouw Type:</strong> {selectedOpdracht.opbouw_hoogwerkers_type || 'Niet opgegeven'}</p>
+                <p><strong>Opbouw Aantal:</strong> {selectedOpdracht.opbouw_hoogwerkers_amount || 'Niet opgegeven'}</p>
+                <p><strong>Afbouw Type:</strong> {selectedOpdracht.afbouw_hoogwerkers_type || 'Niet opgegeven'}</p>
+                <p><strong>Afbouw Aantal:</strong> {selectedOpdracht.afbouw_hoogwerkers_amount || 'Niet opgegeven'}</p>
+              </div>
+            </div>
 
-            <h3>Links en Opslag</h3>
-            <p><strong>Magazijnbon Link:</strong> {selectedOpdracht.magazijnbon_link ? <a href={selectedOpdracht.magazijnbon_link} target="_blank" rel="noopener noreferrer">Bekijk</a> : 'Niet opgegeven'}</p>
-            <p><strong>Project Map Opbouw Link:</strong> {selectedOpdracht.project_map_opbouw_link ? <a href={selectedOpdracht.project_map_opbouw_link} target="_blank" rel="noopener noreferrer">Bekijk</a> : 'Niet opgegeven'}</p>
-            <p><strong>Project Map Afbouw Link:</strong> {selectedOpdracht.project_map_afbouw_link ? <a href={selectedOpdracht.project_map_afbouw_link} target="_blank" rel="noopener noreferrer">Bekijk</a> : 'Niet opgegeven'}</p>
-            <p><strong>Storageplace Adres:</strong> {selectedOpdracht.storageplace_adres || 'Niet opgegeven'}</p>
+            <div style={{ marginBottom: '1rem' }}>
+              <h4 style={{ marginBottom: '0.5rem', color: '#333' }}>Links en Opslag</h4>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                <p><strong>Magazijnbon Link:</strong> {selectedOpdracht.magazijnbon_link ? <a href={selectedOpdracht.magazijnbon_link} target="_blank" rel="noopener noreferrer">Bekijk</a> : 'Niet opgegeven'}</p>
+                <p><strong>Project Map Opbouw Link:</strong> {selectedOpdracht.project_map_opbouw_link ? <a href={selectedOpdracht.project_map_opbouw_link} target="_blank" rel="noopener noreferrer">Bekijk</a> : 'Niet opgegeven'}</p>
+                <p><strong>Project Map Afbouw Link:</strong> {selectedOpdracht.project_map_afbouw_link ? <a href={selectedOpdracht.project_map_afbouw_link} target="_blank" rel="noopener noreferrer">Bekijk</a> : 'Niet opgegeven'}</p>
+                <p><strong>Storageplace Adres:</strong> {selectedOpdracht.storageplace_adres || 'Niet opgegeven'}</p>
+              </div>
+            </div>
 
             {!user?.is_poster && (
               <div style={{ marginTop: '1rem' }}>
