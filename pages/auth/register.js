@@ -31,7 +31,7 @@ export default function Register() {
     setMessage('');
 
     if (password !== confirmPassword) {
-      setMessage('Passwords do not match');
+      setMessage('Wachtwoorden komen niet overeen');
       setLoading(false);
       return;
     }
@@ -53,10 +53,10 @@ export default function Register() {
       const data = await response.json();
 
       if (!response.ok) {
-        throw new Error(data.error || 'Registration failed');
+        throw new Error(data.error || 'Registratie mislukt');
       }
 
-      setMessage('Registration successful! Please check your email for verification.');
+      setMessage('U bent geregistreerd.');
     } catch (error) {
       setMessage(error.message);
     } finally {

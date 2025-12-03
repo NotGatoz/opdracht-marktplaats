@@ -49,6 +49,36 @@ export default async function handler(req, res) {
       LIMIT 10
     `);
 
+    // User registrations over time (last 12 months)
+    const userRegistrationsOverTime = await pool.query(`
+      SELECT
+        DATE_TRUNC('month', created_at) as month,
+        COUNT(*) as count
+      FROM users
+      WHERE created_at >= NOW() - INTERVAL '12 months'
+      GROUP BY DATE_TRUNC('month', created_at)
+      ORDER BY month
+    `);
+
+    // User status distribution
+    const userStatusDistribution = await pool.query(`
+      SELECT status, COUNT(*) as count
+      FROM users
+      GROUP BY status
+    `);
+
+    // User logins over time (last 12 months) - based on last_login timestamps
+    const userLoginsOverTime = await pool.query(`
+      SELECT
+        DATE_TRUNC('month', last_login) as month,
+        COUNT(*) as count
+      FROM users
+      WHERE last_login IS NOT NULL
+      AND last_login >= NOW() - INTERVAL '12 months'
+      GROUP BY DATE_TRUNC('month', last_login)
+      ORDER BY month
+    `);
+
     // Total stats
     const totalStats = await pool.query(`
       SELECT
@@ -63,6 +93,9 @@ export default async function handler(req, res) {
       bidsOverTime: bidsOverTime.rows,
       statusDistribution: statusDistribution.rows,
       avgBidPerOpdracht: avgBidPerOpdracht.rows,
+      userRegistrationsOverTime: userRegistrationsOverTime.rows,
+      userStatusDistribution: userStatusDistribution.rows,
+      userLoginsOverTime: userLoginsOverTime.rows,
       totalStats: totalStats.rows[0]
     });
   } catch (err) {

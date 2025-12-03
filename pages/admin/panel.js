@@ -172,7 +172,7 @@ export default function AdminPanel() {
     return d.toLocaleString('nl-NL', { month: 'short' });
   };
 
-  const lineChartData = statsData && {
+  const lineChartData = statsData && statsData.opdrachtenOverTime && statsData.bidsOverTime && {
     labels: statsData.opdrachtenOverTime.map(m => formatMonth(m.month)),
     datasets: [
       {
@@ -192,7 +192,7 @@ export default function AdminPanel() {
     ]
   };
 
-  const pieChartData = statsData && {
+  const pieChartData = statsData && statsData.statusDistribution && {
     labels: statsData.statusDistribution.map(s => s.status),
     datasets: [
       {
@@ -202,13 +202,49 @@ export default function AdminPanel() {
     ]
   };
 
-  const barChartData = statsData && {
+  const barChartData = statsData && statsData.avgBidPerOpdracht && {
     labels: statsData.avgBidPerOpdracht.map(o => o.title),
     datasets: [
       {
         label: 'Gemiddeld Bod (€)',
         data: statsData.avgBidPerOpdracht.map(o => o.avg_amount),
         backgroundColor: '#0066cc'
+      }
+    ]
+  };
+
+  const userRegistrationsChartData = statsData && statsData.userRegistrationsOverTime && {
+    labels: statsData.userRegistrationsOverTime.map(m => formatMonth(m.month)),
+    datasets: [
+      {
+        label: 'Nieuwe Gebruikers',
+        data: statsData.userRegistrationsOverTime.map(m => m.count),
+        borderColor: '#ff6b6b',
+        backgroundColor: 'rgba(255,107,107,0.3)',
+        fill: true,
+      }
+    ]
+  };
+
+  const userStatusPieChartData = statsData && statsData.userStatusDistribution && {
+    labels: statsData.userStatusDistribution.map(s => s.status),
+    datasets: [
+      {
+        data: statsData.userStatusDistribution.map(s => s.count),
+        backgroundColor: ['#51cf66', '#ff6b6b', '#ffd700', '#0066cc']
+      }
+    ]
+  };
+
+  const userLoginsChartData = statsData && statsData.userLoginsOverTime && {
+    labels: statsData.userLoginsOverTime.map(m => formatMonth(m.month)),
+    datasets: [
+      {
+        label: 'Gebruikers Logins',
+        data: statsData.userLoginsOverTime.map(m => m.count),
+        borderColor: '#9c88ff',
+        backgroundColor: 'rgba(156,136,255,0.3)',
+        fill: true,
       }
     ]
   };
@@ -322,37 +358,71 @@ export default function AdminPanel() {
           {statsLoading || !statsData ? (
             <p>Statistieken laden...</p>
           ) : (
-            <>
-              {/* Line Chart */}
-              <div style={{ marginBottom: '2rem', maxHeight: '350px' }}>
-                <h3 style={{ fontSize: '1.1rem', marginBottom: '0.5rem' }}>
+            <div style={{
+              display: 'grid',
+              gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
+              gap: '1.5rem'
+            }}>
+              {/* Line Chart - Opdrachten & Bids */}
+              <div className="card round white" style={{ padding: '1rem', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+                <h3 style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>
                   Opdrachten & Bids per maand
                 </h3>
-                <div style={{ height: '300px' }}>
+                <div style={{ height: '200px' }}>
                   <Line data={lineChartData} options={{ maintainAspectRatio: false }} />
                 </div>
               </div>
 
-              {/* Pie Chart */}
-              <div style={{ marginBottom: '2rem', width: '250px' }}>
-                <h3 style={{ fontSize: '1.1rem', marginBottom: '0.5rem' }}>
+              {/* Line Chart - User Registrations */}
+              <div className="card round white" style={{ padding: '1rem', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+                <h3 style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>
+                  Gebruikersregistraties per maand
+                </h3>
+                <div style={{ height: '200px' }}>
+                  <Line data={userRegistrationsChartData} options={{ maintainAspectRatio: false }} />
+                </div>
+              </div>
+
+              {/* Line Chart - User Logins */}
+              <div className="card round white" style={{ padding: '1rem', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+                <h3 style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>
+                  Gebruikers Logins per maand
+                </h3>
+                <div style={{ height: '200px' }}>
+                  <Line data={userLoginsChartData} options={{ maintainAspectRatio: false }} />
+                </div>
+              </div>
+
+              {/* Pie Chart - Opdracht Status */}
+              <div className="card round white" style={{ padding: '1rem', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+                <h3 style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>
                   Opdracht Status Verdeling
                 </h3>
-                <div style={{ height: '250px' }}>
+                <div style={{ height: '200px', display: 'flex', justifyContent: 'center' }}>
                   <Pie data={pieChartData} options={{ maintainAspectRatio: false }} />
                 </div>
               </div>
 
-              {/* Bar Chart */}
-              <div style={{ marginBottom: '2rem', maxHeight: '300px' }}>
-                <h3 style={{ fontSize: '1.1rem', marginBottom: '0.5rem' }}>
+              {/* Pie Chart - User Status */}
+              <div className="card round white" style={{ padding: '1rem', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+                <h3 style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>
+                  Gebruikers Status Verdeling
+                </h3>
+                <div style={{ height: '200px', display: 'flex', justifyContent: 'center' }}>
+                  <Pie data={userStatusPieChartData} options={{ maintainAspectRatio: false }} />
+                </div>
+              </div>
+
+              {/* Bar Chart - Top Opdrachten */}
+              <div className="card round white" style={{ padding: '1rem', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
+                <h3 style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>
                   Top 10 Opdrachten met Hoogste Gemiddelde Bieding
                 </h3>
-                <div style={{ height: '280px' }}>
+                <div style={{ height: '250px' }}>
                   <Bar data={barChartData} options={{ maintainAspectRatio: false }} />
                 </div>
               </div>
-            </>
+            </div>
           )}
         </div>
 

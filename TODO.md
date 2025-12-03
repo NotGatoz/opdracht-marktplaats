@@ -1,5 +1,18 @@
-- [x] Add import for Link from 'next/link' in pages/index.js
-- [x] Add the button Link after the h1 in the content div of pages/index.js
-- [x] Create the React component for pages/opdracht/aangenomen-opdrachten.js
-- [x] Create API endpoint for bid actions (accept/ignore)
-- [x] Add buttons to mijn-opdrachten page for accepting/ignoring bids
+# TODO: Enhance Admin Panel Graphs and Diagrams
+
+## Tasks
+- [x] Update stats API to include user registrations over time
+- [x] Add new chart data for user registrations and user status distribution in admin panel
+- [x] Improve layout with responsive grid for charts
+- [x] Update login API to track login counts in users table
+- [x] Update stats API to query login data from users table
+- [x] Test the enhanced admin panel
+
+## Progress
+- [x] Plan approved by user
+- [x] Stats API updated with user data
+- [x] Admin panel updated with new charts and grid layout
+- [x] Login tracking implemented in users table
+- [x] Fixed chart rendering errors with null checks
+- [x] Database columns added and testing completed successfully
+- [x] Task completed successfully - all charts loading properly

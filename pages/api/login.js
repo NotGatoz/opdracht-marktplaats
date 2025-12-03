@@ -33,6 +33,17 @@ export default async function handler(req, res) {
       return res.status(401).json({ error: 'Invalid credentials' });
     }
 
+    // Update login count and last login timestamp
+    try {
+      await pool.query(
+        'UPDATE users SET login_count = COALESCE(login_count, 0) + 1, last_login = NOW() WHERE id = $1',
+        [user.id]
+      );
+    } catch (err) {
+      console.warn('Could not update login count:', err.message);
+      // Continue with login even if update fails
+    }
+
     // Remove password before sending back
     const { password: _pw, ...userSafe } = user;
 
