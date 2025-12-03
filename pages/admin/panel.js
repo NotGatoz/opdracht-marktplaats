@@ -227,7 +227,14 @@ export default function AdminPanel() {
   };
 
   const userStatusPieChartData = statsData && statsData.userStatusDistribution && {
-    labels: statsData.userStatusDistribution.map(s => s.status),
+    labels: statsData.userStatusDistribution.map(s => {
+      const statusMap = {
+        pending: 'In Afwachting',
+        approved: 'Goedgekeurd',
+        rejected: 'Afgewezen'
+      };
+      return statusMap[s.status] || s.status;
+    }),
     datasets: [
       {
         data: statsData.userStatusDistribution.map(s => s.count),
@@ -363,13 +370,13 @@ export default function AdminPanel() {
               gridTemplateColumns: 'repeat(auto-fit, minmax(350px, 1fr))',
               gap: '1.5rem'
             }}>
-              {/* Line Chart - Opdrachten & Bids */}
+              {/* Pie Chart - User Status */}
               <div className="card round white" style={{ padding: '1rem', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
                 <h3 style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>
-                  Opdrachten & Bids per maand
+                  Gebruikers Status Verdeling
                 </h3>
-                <div style={{ height: '200px' }}>
-                  <Line data={lineChartData} options={{ maintainAspectRatio: false }} />
+                <div style={{ height: '200px', display: 'flex', justifyContent: 'center' }}>
+                  <Pie data={userStatusPieChartData} options={{ maintainAspectRatio: false }} />
                 </div>
               </div>
 
@@ -403,13 +410,13 @@ export default function AdminPanel() {
                 </div>
               </div>
 
-              {/* Pie Chart - User Status */}
+              {/* Line Chart - Opdrachten & Bids */}
               <div className="card round white" style={{ padding: '1rem', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
                 <h3 style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>
-                  Gebruikers Status Verdeling
+                  Opdrachten & Bids per maand
                 </h3>
-                <div style={{ height: '200px', display: 'flex', justifyContent: 'center' }}>
-                  <Pie data={userStatusPieChartData} options={{ maintainAspectRatio: false }} />
+                <div style={{ height: '200px' }}>
+                  <Line data={lineChartData} options={{ maintainAspectRatio: false }} />
                 </div>
               </div>
 
