@@ -60,8 +60,8 @@ export default function Login() {
       <div style={{flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', padding: '2rem'}}>
         {/* Welcome Header */}
         <div style={{textAlign: 'center', marginBottom: '3rem'}}>
-          <img src="/images/avontuur-logo.png" alt="Avontuur Logo" style={{width: '100px', marginBottom: '1rem', marginTop: '3rem'}} />
-          <h1 style={{fontSize: '2.5rem', color: '#333', margin: '0 0 0.5rem 0'}}>Welkom op Opdracht Marktplaats</h1>
+          <img src="/images/avontuur-logo.png" alt="Avontuur Logo" style={{width: '120px', marginBottom: '1rem', marginTop: '3rem'}} />
+          <h1 style={{fontSize: '2rem', color: '#333', margin: '0 0 0 0'}}>Welkom op Opdracht Marktplaats</h1>
         </div>
 
         {/* Login Card */}
