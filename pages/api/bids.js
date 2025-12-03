@@ -7,7 +7,7 @@ export default async function handler(req, res) {
 
     try {
       const result = await pool.query(
-        `SELECT b.id, b.amount, b.created_at, u.name as user_name
+        `SELECT b.id, b.amount, b.created_at, b.comment, u.name as user_name
          FROM bids b
          JOIN users u ON b.user_id = u.id
          WHERE b.opdracht_id = $1
@@ -20,16 +20,16 @@ export default async function handler(req, res) {
       res.status(500).json({ error: 'Kan biedingen niet ophalen' });
     }
   } else if (req.method === 'POST') {
-    const { opdrachtId, userId, amount } = req.body;
+    const { opdrachtId, userId, amount, comment } = req.body;
     if (!opdrachtId || !userId || !amount) {
       return res.status(400).json({ error: 'opdrachtId, userId and amount are required' });
     }
 
     try {
       const result = await pool.query(
-        `INSERT INTO bids (opdracht_id, user_id, amount, created_at)
-         VALUES ($1, $2, $3, NOW()) RETURNING *`,
-        [opdrachtId, userId, amount]
+        `INSERT INTO bids (opdracht_id, user_id, amount, comment, created_at)
+         VALUES ($1, $2, $3, $4, NOW()) RETURNING *`,
+        [opdrachtId, userId, amount, comment || null]
       );
       res.status(201).json({ bid: result.rows[0] });
     } catch (err) {

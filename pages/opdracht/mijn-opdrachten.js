@@ -234,36 +234,18 @@ export default function MijnOpdrachtenPage() {
               </div>
             </div>
 
-            {!user?.is_poster && (
-              <div style={{ marginTop: '1rem' }}>
-                <h3>Plaats je bod</h3>
-                <input
-                  type="number"
-                  value={newBid}
-                  onChange={(e) => setNewBid(e.target.value)}
-                  placeholder="Bedrag (€)"
-                  style={{ padding: '0.5rem', width: '100%', marginBottom: '0.5rem', borderRadius: '4px', border: '1px solid #ccc' }}
-                />
-                <button
-                  onClick={handleBidSubmit}
-                  disabled={bidLoading}
-                  style={{ padding: '0.5rem 1rem', backgroundColor: '#51cf66', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
-                >
-                  {bidLoading ? 'Bezig...' : 'Bod plaatsen'}
-                </button>
-
-                <h4 style={{ marginTop: '1rem' }}>Biedingen</h4>
-                {bids.length === 0 ? (
-                  <p>Nog geen biedingen</p>
-                ) : (
-                  <ul>
-                    {bids.map((bid) => (
-                      <li key={bid.id}>€{bid.amount} door {bid.user_name}</li>
-                    ))}
-                  </ul>
-                )}
-              </div>
-            )}
+            <div style={{ marginTop: '1rem' }}>
+              <h4>Biedingen</h4>
+              {bids.length === 0 ? (
+                <p>Nog geen biedingen</p>
+              ) : (
+                <ul>
+                  {bids.map((bid) => (
+                    <li key={bid.id}>€{bid.amount} door {bid.user_name} ({new Date(bid.created_at).toLocaleDateString()}){bid.comment && ` - ${bid.comment}`}</li>
+                  ))}
+                </ul>
+              )}
+            </div>
           </div>
         </div>
       )}

@@ -8,6 +8,7 @@ export default function OpdrachtenPage() {
   const [selectedOpdracht, setSelectedOpdracht] = useState(null);
   const [user, setUser] = useState(null);
   const [newBid, setNewBid] = useState('');
+  const [bidComment, setBidComment] = useState('');
   const [bids, setBids] = useState([]);
   const [bidLoading, setBidLoading] = useState(false);
 
@@ -61,16 +62,17 @@ export default function OpdrachtenPage() {
       const res = await fetch('/api/bids', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSONJSON.stringify({
+        body: JSON.stringify({
           opdrachtId: selectedOpdracht.id,
           userId: user.id,
           amount: Number(newBid),
+          comment: bidComment,
         }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Fout bij plaatsen bod');
       setNewBid('');
-      fetchBids(selectedOpdracht.id);
+      setBidComment('');
     } catch (err) {
       alert(err.message);
     } finally {
@@ -243,6 +245,12 @@ export default function OpdrachtenPage() {
                   placeholder="Bedrag (€)"
                   style={{ padding: '0.5rem', width: '100%', marginBottom: '0.5rem', borderRadius: '4px', border: '1px solid #ccc' }}
                 />
+                <textarea
+                  value={bidComment}
+                  onChange={(e) => setBidComment(e.target.value)}
+                  placeholder="Opmerking (optioneel)"
+                  style={{ padding: '0.5rem', width: '100%', marginBottom: '0.5rem', borderRadius: '4px', border: '1px solid #ccc', minHeight: '60px' }}
+                />
                 <button
                   onClick={handleBidSubmit}
                   disabled={bidLoading}
@@ -251,16 +259,7 @@ export default function OpdrachtenPage() {
                   {bidLoading ? 'Bezig...' : 'Bod plaatsen'}
                 </button>
 
-                <h4 style={{ marginTop: '1rem' }}>Biedingen</h4>
-                {bids.length === 0 ? (
-                  <p>Nog geen biedingen</p>
-                ) : (
-                  <ul>
-                    {bids.map((bid) => (
-                      <li key={bid.id}>€{bid.amount} door {bid.user_name}</li>
-                    ))}
-                  </ul>
-                )}
+
               </div>
             )}
           </div>
