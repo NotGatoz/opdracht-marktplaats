@@ -21,11 +21,17 @@ export default async function handler(req, res) {
 
         res.status(200).json({ message: 'Bid accepted' });
       } else if (action === 'ignore') {
-        if (!userId || !opdrachtId) {
-          return res.status(400).json({ error: 'userId and opdrachtId are required for ignore action' });
+        if (!bidId && (!userId || !opdrachtId)) {
+          return res.status(400).json({ error: 'Either bidId or (userId and opdrachtId) are required for ignore action' });
         }
-        // Delete the user's bid for this opdracht
-        const deleteResult = await pool.query('DELETE FROM bids WHERE user_id = $1 AND opdracht_id = $2', [userId, opdrachtId]);
+        let deleteResult;
+        if (bidId) {
+          // Delete specific bid by bidId (for poster removing any bid)
+          deleteResult = await pool.query('DELETE FROM bids WHERE id = $1', [bidId]);
+        } else {
+          // Delete the user's bid for this opdracht (for bidder removing their own bid)
+          deleteResult = await pool.query('DELETE FROM bids WHERE user_id = $1 AND opdracht_id = $2', [userId, opdrachtId]);
+        }
         if (deleteResult.rowCount === 0) {
           return res.status(404).json({ error: 'No bid found to delete' });
         }
