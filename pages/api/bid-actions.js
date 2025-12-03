@@ -30,6 +30,13 @@ export default async function handler(req, res) {
           return res.status(404).json({ error: 'No bid found to delete' });
         }
         res.status(200).json({ message: 'Bid ignored' });
+      } else if (action === 'remove') {
+        if (!opdrachtId) {
+          return res.status(400).json({ error: 'opdrachtId is required for remove action' });
+        }
+        // Remove the assigned user from the opdracht
+        await pool.query('UPDATE opdrachten SET accepted_bid_user_id = NULL, status = $1 WHERE id = $2', ['open', opdrachtId]);
+        res.status(200).json({ message: 'Assigned user removed' });
       } else {
         res.status(400).json({ error: 'Invalid action' });
       }

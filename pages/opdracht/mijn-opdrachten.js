@@ -105,6 +105,11 @@ export default function MijnOpdrachtenPage() {
           const data = await res.json();
           if (!res.ok) throw new Error(data.error || 'Fout bij ophalen mijn opdrachten');
           setOpdrachten(data.opdrachten);
+          // Update selectedOpdracht if it's still selected
+          const updatedOpdracht = data.opdrachten.find(op => op.id === selectedOpdracht.id);
+          if (updatedOpdracht) {
+            setSelectedOpdracht(updatedOpdracht);
+          }
         } catch (err) {
           console.error(err.message);
         }
@@ -267,6 +272,17 @@ export default function MijnOpdrachtenPage() {
 
             <div style={{ marginTop: '1rem' }}>
               <h4>Biedingen</h4>
+              {selectedOpdracht.status === 'aangenomen' && (
+                <div style={{ marginBottom: '1rem', padding: '1rem', backgroundColor: '#f0f8f0', border: '1px solid #4CAF50', borderRadius: '4px' }}>
+                  <p style={{ color: 'green', fontWeight: 'bold', margin: '0 0 0.5rem 0' }}>Deze opdracht heeft een toegewezen gebruiker</p>
+                  <button
+                    onClick={() => handleBidAction('remove', null)}
+                    style={{ background: 'red', color: 'white', border: 'none', padding: '0.5rem 1rem', borderRadius: '4px', cursor: 'pointer' }}
+                  >
+                    Ontkoppel aannemer van bod
+                  </button>
+                </div>
+              )}
               {bids.length === 0 ? (
                 <p>Nog geen biedingen</p>
               ) : (
@@ -292,6 +308,9 @@ export default function MijnOpdrachtenPage() {
                       )}
                       {selectedOpdracht.status === 'aangenomen' && selectedOpdracht.accepted_bid_user_id == bid.user_id && (
                         <p style={{ color: 'green', fontWeight: 'bold' }}>Dit bod is geaccepteerd</p>
+                      )}
+                      {selectedOpdracht.status === 'aangenomen' && selectedOpdracht.accepted_bid_user_id != bid.user_id && (
+                        <p style={{ color: 'gray' }}>Er is al een bod geaccepteerd voor deze opdracht</p>
                       )}
                     </div>
                   ))}
