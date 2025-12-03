@@ -1,10 +1,5 @@
-# TODO: Implement Mijn Opdrachten Page
-
-## Steps to Complete
-- [ ] Update pages/api/opdracht/mijn-opdrachten.js to use the same SELECT query as opdrachten.js, adding WHERE user_id = $1 for filtering.
-- [ ] Create pages/opdracht/mijn-opdrachten.js by copying opdrachten.js, with changes:
-  - Change h1 title to "Mijn Opdrachten".
-  - Update fetch URL to `/api/opdracht/mijn-opdrachten?userId=${user.id}`.
-  - Make fetchOpdrachten useEffect depend on user state.
-  - Bidding remains hidden for posters.
-- [ ] Verify the new page loads correctly and displays only the user's assignments.
+- [x] Add import for Link from 'next/link' in pages/index.js
+- [x] Add the button Link after the h1 in the content div of pages/index.js
+- [x] Create the React component for pages/opdracht/aangenomen-opdrachten.js
+- [x] Create API endpoint for bid actions (accept/ignore)
+- [x] Add buttons to mijn-opdrachten page for accepting/ignoring bids

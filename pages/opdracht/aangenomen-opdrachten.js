@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { Navbar, Footer } from '../../components/template';
 
-export default function MijnOpdrachtenPage() {
+export default function AangenomenOpdrachtenPage() {
   const [opdrachten, setOpdrachten] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
@@ -30,9 +30,9 @@ export default function MijnOpdrachtenPage() {
     if (!user) return;
     const fetchOpdrachten = async () => {
       try {
-        const res = await fetch(`/api/opdracht/mijn-opdrachten?userId=${user.id}`);
+        const res = await fetch(`/api/opdracht/aangenomen-opdrachten?userId=${user.id}`);
         const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Fout bij ophalen mijn opdrachten');
+        if (!res.ok) throw new Error(data.error || 'Fout bij ophalen aangenomen opdrachten');
         setOpdrachten(data.opdrachten);
       } catch (err) {
         setError(err.message);
@@ -84,31 +84,12 @@ export default function MijnOpdrachtenPage() {
     fetchBids(opdracht.id);
   };
 
-  const handleBidAction = async (action, bidId) => {
-    try {
-      const res = await fetch('/api/bid-actions', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({
-          action,
-          bidId,
-          opdrachtId: selectedOpdracht.id,
-        }),
-      });
-      const data = await res.json();
-      if (!res.ok) throw new Error(data.error || 'Fout bij actie');
-      fetchBids(selectedOpdracht.id); // Refresh bids
-    } catch (err) {
-      alert(err.message);
-    }
-  };
-
   return (
     <div className="theme-l5" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <Navbar />
 
       <div style={{ flex: 1, padding: '2rem' }}>
-        <h1>Mijn Opdrachten</h1>
+        <h1>Aangenomen Opdrachten</h1>
         {loading && <p>Laden...</p>}
         {error && <p style={{ color: 'red' }}>{error}</p>}
 
@@ -258,25 +239,11 @@ export default function MijnOpdrachtenPage() {
               {bids.length === 0 ? (
                 <p>Nog geen biedingen</p>
               ) : (
-                <div>
+                <ul>
                   {bids.map((bid) => (
-                    <div key={bid.id} style={{ marginBottom: '0.5rem', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}>
-                      <p>€{bid.amount} door {bid.user_name} ({new Date(bid.created_at).toLocaleDateString()}){bid.comment && ` - ${bid.comment}`}</p>
-                      <button
-                        onClick={() => handleBidAction('accept', bid.id)}
-                        style={{ marginRight: '0.5rem', background: 'green', color: 'white', border: 'none', padding: '0.25rem 0.5rem', borderRadius: '4px', cursor: 'pointer' }}
-                      >
-                        Accepteer bod
-                      </button>
-                      <button
-                        onClick={() => handleBidAction('ignore', bid.id)}
-                        style={{ background: 'red', color: 'white', border: 'none', padding: '0.25rem 0.5rem', borderRadius: '4px', cursor: 'pointer' }}
-                      >
-                        Verwijder bod
-                      </button>
-                    </div>
+                    <li key={bid.id}>€{bid.amount} door {bid.user_name} ({new Date(bid.created_at).toLocaleDateString()}){bid.comment && ` - ${bid.comment}`}</li>
                   ))}
-                </div>
+                </ul>
               )}
             </div>
           </div>

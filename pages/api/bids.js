@@ -7,9 +7,10 @@ export default async function handler(req, res) {
 
     try {
       const result = await pool.query(
-        `SELECT b.id, b.amount, b.created_at, b.comment, u.name as user_name
+        `SELECT b.id, b.amount, b.created_at, b.comment, u.name as user_name, b.user_id, o.accepted_bid_user_id
          FROM bids b
          JOIN users u ON b.user_id = u.id
+         JOIN opdrachten o ON b.opdracht_id = o.id
          WHERE b.opdracht_id = $1
          ORDER BY b.created_at DESC`,
         [opdrachtId]

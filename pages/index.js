@@ -1,6 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { useRouter } from 'next/router';
 import { Navbar, Footer } from '../components/template';
+import Link from 'next/link';
 
 export default function Dashboard() {
   const [userData, setUserData] = useState(null);
@@ -126,6 +127,9 @@ useEffect(() => {
         {/* Dashboard Content */}
         <div className="container content" style={{ marginTop: '20px', marginLeft: '320px', flex: 1 }}>
           <h1>Welkom, {userData.name}!</h1>
+          <Link href="/opdracht/aangenomen-opdrachten" className="button theme-d4" style={{ float: 'right' }}>
+            aangenomen/geboden opdrachten
+          </Link>
 
           {/* Stats */}
           {loadingStats ? (
