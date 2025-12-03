@@ -98,6 +98,18 @@ export default function MijnOpdrachtenPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Fout bij actie');
       fetchBids(selectedOpdracht.id); // Refresh bids
+      // Refresh opdrachten to update status
+      const fetchOpdrachten = async () => {
+        try {
+          const res = await fetch(`/api/opdracht/mijn-opdrachten?userId=${user.id}`);
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || 'Fout bij ophalen mijn opdrachten');
+          setOpdrachten(data.opdrachten);
+        } catch (err) {
+          console.error(err.message);
+        }
+      };
+      fetchOpdrachten();
     } catch (err) {
       alert(err.message);
     }
@@ -108,7 +120,7 @@ export default function MijnOpdrachtenPage() {
       <Navbar />
 
       <div style={{ flex: 1, padding: '2rem' }}>
-        <h1>Mijn Opdrachten</h1>
+        <h1>Mijn Geplaatste Opdrachten</h1>
         {loading && <p>Laden...</p>}
         {error && <p style={{ color: 'red' }}>{error}</p>}
 
@@ -123,7 +135,7 @@ export default function MijnOpdrachtenPage() {
               <h3>{opdracht.title}</h3>
               <p>{opdracht.description.substring(0, 80)}...</p>
               <p>Deadline: {new Date(opdracht.deadline).toLocaleDateString()}</p>
-              <p>Status: {opdracht.status}</p>
+              <p>Status: <span style={{ color: opdracht.status === 'aangenomen' ? 'green' : 'inherit' }}>{opdracht.status}</span></p>
             </div>
           ))}
         </div>
@@ -185,7 +197,7 @@ export default function MijnOpdrachtenPage() {
                 <p><strong>Beschrijving:</strong> {selectedOpdracht.description}</p>
                 <p><strong>Categorie:</strong> {selectedOpdracht.category || 'Geen'}</p>
                 <p><strong>Deadline:</strong> {new Date(selectedOpdracht.deadline).toLocaleDateString()}</p>
-                <p><strong>Status:</strong> {selectedOpdracht.status}</p>
+                <p><strong>Status:</strong> <span style={{ color: selectedOpdracht.status === 'aangenomen' ? 'green' : 'inherit' }}>{selectedOpdracht.status}</span></p>
                 <p><strong>Aangemaakt:</strong> {new Date(selectedOpdracht.created_at).toLocaleDateString()}</p>
               </div>
             </div>
@@ -262,18 +274,25 @@ export default function MijnOpdrachtenPage() {
                   {bids.map((bid) => (
                     <div key={bid.id} style={{ marginBottom: '0.5rem', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}>
                       <p>€{bid.amount} door {bid.user_name} ({new Date(bid.created_at).toLocaleDateString()}){bid.comment && ` - ${bid.comment}`}</p>
-                      <button
-                        onClick={() => handleBidAction('accept', bid.id)}
-                        style={{ marginRight: '0.5rem', background: 'green', color: 'white', border: 'none', padding: '0.25rem 0.5rem', borderRadius: '4px', cursor: 'pointer' }}
-                      >
-                        Accepteer bod
-                      </button>
-                      <button
-                        onClick={() => handleBidAction('ignore', bid.id)}
-                        style={{ background: 'red', color: 'white', border: 'none', padding: '0.25rem 0.5rem', borderRadius: '4px', cursor: 'pointer' }}
-                      >
-                        Verwijder bod
-                      </button>
+                      {selectedOpdracht.status !== 'aangenomen' && (
+                        <>
+                          <button
+                            onClick={() => handleBidAction('accept', bid.id)}
+                            style={{ marginRight: '0.5rem', background: 'green', color: 'white', border: 'none', padding: '0.25rem 0.5rem', borderRadius: '4px', cursor: 'pointer' }}
+                          >
+                            Accepteer bod
+                          </button>
+                          <button
+                            onClick={() => handleBidAction('ignore', bid.id)}
+                            style={{ background: 'red', color: 'white', border: 'none', padding: '0.25rem 0.5rem', borderRadius: '4px', cursor: 'pointer' }}
+                          >
+                            Verwijder bod
+                          </button>
+                        </>
+                      )}
+                      {selectedOpdracht.status === 'aangenomen' && selectedOpdracht.accepted_bid_user_id == bid.user_id && (
+                        <p style={{ color: 'green', fontWeight: 'bold' }}>Dit bod is geaccepteerd</p>
+                      )}
                     </div>
                   ))}
                 </div>

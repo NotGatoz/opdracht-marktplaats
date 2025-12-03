@@ -16,8 +16,8 @@ export default async function handler(req, res) {
         }
         const bidUserId = bidResult.rows[0].user_id;
 
-        // Update the opdracht to accept the bid
-        await pool.query('UPDATE opdrachten SET accepted_bid_user_id = $1 WHERE id = $2', [bidUserId, opdrachtId]);
+        // Update the opdracht to accept the bid and set status to 'aangenomen'
+        await pool.query('UPDATE opdrachten SET accepted_bid_user_id = $1, status = $2 WHERE id = $3', [bidUserId, 'aangenomen', opdrachtId]);
 
         res.status(200).json({ message: 'Bid accepted' });
       } else if (action === 'ignore') {

@@ -2,7 +2,8 @@ import React, { useState, useEffect } from 'react';
 import { Navbar, Footer } from '../../components/template';
 
 export default function AangenomenOpdrachtenPage() {
-  const [opdrachten, setOpdrachten] = useState([]);
+  const [gebodenOpdrachten, setGebodenOpdrachten] = useState([]);
+  const [aangenomenOpdrachten, setAangenomenOpdrachten] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
   const [selectedOpdracht, setSelectedOpdracht] = useState(null);
@@ -29,11 +30,19 @@ export default function AangenomenOpdrachtenPage() {
   useEffect(() => {
     if (!user) return;
     const fetchOpdrachten = async () => {
+      setLoading(true);
       try {
-        const res = await fetch(`/api/opdracht/aangenomen-opdrachten?userId=${user.id}`);
-        const data = await res.json();
-        if (!res.ok) throw new Error(data.error || 'Fout bij ophalen aangenomen opdrachten');
-        setOpdrachten(data.opdrachten);
+        // Fetch geboden opdrachten
+        const gebodenRes = await fetch(`/api/opdracht/aangenomen-opdrachten?userId=${user.id}&type=geboden`);
+        const gebodenData = await gebodenRes.json();
+        if (!gebodenRes.ok) throw new Error(gebodenData.error || 'Fout bij ophalen geboden opdrachten');
+        setGebodenOpdrachten(gebodenData.opdrachten);
+
+        // Fetch aangenomen opdrachten
+        const aangenomenRes = await fetch(`/api/opdracht/aangenomen-opdrachten?userId=${user.id}&type=aangenomen`);
+        const aangenomenData = await aangenomenRes.json();
+        if (!aangenomenRes.ok) throw new Error(aangenomenData.error || 'Fout bij ophalen aangenomen opdrachten');
+        setAangenomenOpdrachten(aangenomenData.opdrachten);
       } catch (err) {
         setError(err.message);
       } finally {
@@ -89,24 +98,53 @@ export default function AangenomenOpdrachtenPage() {
       <Navbar />
 
       <div style={{ flex: 1, padding: '2rem' }}>
-        <h1>Aangenomen Opdrachten</h1>
+        <h1>Geboden en Aangenomen Opdrachten</h1>
         {loading && <p>Laden...</p>}
         {error && <p style={{ color: 'red' }}>{error}</p>}
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem' }}>
-          {opdrachten.map((opdracht) => (
-            <div
-              key={opdracht.id}
-              className="card round white"
-              style={{ padding: '1rem', cursor: 'pointer' }}
-              onClick={() => openModal(opdracht)}
-            >
-              <h3>{opdracht.title}</h3>
-              <p>{opdracht.description.substring(0, 80)}...</p>
-              <p>Deadline: {new Date(opdracht.deadline).toLocaleDateString()}</p>
-              <p>Status: {opdracht.status}</p>
+        <div style={{ display: 'flex', gap: '2rem' }}>
+          {/* Left side: Geboden opdrachten */}
+          <div style={{ flex: 1 }}>
+            <h2>Geboden Opdrachten</h2>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem' }}>
+              {gebodenOpdrachten.map((opdracht) => (
+                <div
+                  key={opdracht.id}
+                  className="card round white"
+                  style={{ padding: '1rem', cursor: 'pointer' }}
+                  onClick={() => openModal(opdracht)}
+                >
+                  <h3>{opdracht.title}</h3>
+                  <p>{opdracht.description.substring(0, 80)}...</p>
+                  <p>Deadline: {new Date(opdracht.deadline).toLocaleDateString()}</p>
+                  <p>Status: <span style={{ color: opdracht.status === 'aangenomen' ? 'green' : 'inherit' }}>{opdracht.status}</span></p>
+                </div>
+              ))}
             </div>
-          ))}
+          </div>
+
+          {/* Vertical line */}
+          <div style={{ width: '2px', backgroundColor: '#ccc', margin: '0 1rem' }}></div>
+
+          {/* Right side: Aangenomen opdrachten */}
+          <div style={{ flex: 1 }}>
+            <h2>Aangenomen Opdrachten</h2>
+            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem' }}>
+              {aangenomenOpdrachten.map((opdracht) => (
+                <div
+                  key={opdracht.id}
+                  className="card round white"
+                  style={{ padding: '1rem', cursor: 'pointer' }}
+                  onClick={() => openModal(opdracht)}
+                >
+                  <h3>{opdracht.title}</h3>
+                  <p>{opdracht.description.substring(0, 80)}...</p>
+                  <p>Deadline: {new Date(opdracht.deadline).toLocaleDateString()}</p>
+                  <p>Status: <span style={{ color: opdracht.status === 'aangenomen' ? 'green' : 'inherit' }}>{opdracht.status}</span></p>
+                </div>
+              ))}
+            </div>
+          </div>
         </div>
       </div>
 
@@ -166,7 +204,7 @@ export default function AangenomenOpdrachtenPage() {
                 <p><strong>Beschrijving:</strong> {selectedOpdracht.description}</p>
                 <p><strong>Categorie:</strong> {selectedOpdracht.category || 'Geen'}</p>
                 <p><strong>Deadline:</strong> {new Date(selectedOpdracht.deadline).toLocaleDateString()}</p>
-                <p><strong>Status:</strong> {selectedOpdracht.status}</p>
+                <p><strong>Status:</strong> <span style={{ color: selectedOpdracht.status === 'aangenomen' ? 'green' : 'inherit' }}>{selectedOpdracht.status}</span></p>
                 <p><strong>Aangemaakt:</strong> {new Date(selectedOpdracht.created_at).toLocaleDateString()}</p>
               </div>
             </div>
