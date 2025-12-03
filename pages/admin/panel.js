@@ -355,7 +355,7 @@ export default function AdminPanel() {
             </>
           )}
         </div>
-        
+
         {/* USER MANAGEMENT */}
         <div className="card round white" style={{
           padding: '2rem',
@@ -530,7 +530,7 @@ export default function AdminPanel() {
                                 fontWeight: 'bold',
                               }}
                             >
-                              {u.is_poster ? '❌ Remove Poster' : '➕ Make Poster'}
+                              {u.is_poster ? '❌ Verwijder poster' : '➕ Maak poster'}
                             </button>
                           )}
 
