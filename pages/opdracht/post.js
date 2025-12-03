@@ -112,15 +112,31 @@ useEffect(() => {
     }
 
     try {
+      const formDataToSend = new FormData();
+
+      // Add form data
+      Object.keys(formData).forEach(key => {
+        if (formData[key]) {
+          formDataToSend.append(key, formData[key]);
+        }
+      });
+
+      // Add user ID
+      formDataToSend.append('userId', user.id);
+
+      // Add images
+      imageFiles.forEach((file, index) => {
+        formDataToSend.append(`images`, file);
+      });
+
+      // Add PDFs
+      pdfFiles.forEach((file, index) => {
+        formDataToSend.append(`pdfs`, file);
+      });
+
       const response = await fetch('/api/opdracht/post', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({
-          ...formData,
-          userId: user.id,
-        }),
+        body: formDataToSend,
       });
 
       const data = await response.json();
@@ -607,6 +623,7 @@ useEffect(() => {
                 <label htmlFor="pdfs"><b>PDF's Uploaden (Meerdere mogelijk)</b></label>
                 <input
                   type="file"
+                  name="pdfs"
                   accept="application/pdf"
                   multiple
                   onChange={handlePdfChange}

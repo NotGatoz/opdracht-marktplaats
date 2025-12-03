@@ -1,3 +1,4 @@
+
 import React, { useState, useEffect } from 'react';
 import { Navbar, Footer } from '../../components/template';
 
@@ -10,6 +11,8 @@ export default function MijnOpdrachtenPage() {
   const [newBid, setNewBid] = useState('');
   const [bids, setBids] = useState([]);
   const [bidLoading, setBidLoading] = useState(false);
+  const [deleteModal, setDeleteModal] = useState(null);
+  const [deleteLoading, setDeleteLoading] = useState(false);
 
   useEffect(() => {
     const fetchUser = () => {
@@ -120,6 +123,37 @@ export default function MijnOpdrachtenPage() {
     }
   };
 
+  const handleDeleteOpdracht = async () => {
+    if (!deleteModal) return;
+    setDeleteLoading(true);
+    try {
+      const res = await fetch('/api/opdracht/delete', {
+        method: 'DELETE',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: deleteModal.id }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Fout bij verwijderen opdracht');
+      // Refresh opdrachten list
+      const fetchOpdrachten = async () => {
+        try {
+          const res = await fetch(`/api/opdracht/mijn-opdrachten?userId=${user.id}`);
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || 'Fout bij ophalen mijn opdrachten');
+          setOpdrachten(data.opdrachten);
+        } catch (err) {
+          console.error(err.message);
+        }
+      };
+      fetchOpdrachten();
+      setDeleteModal(null);
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setDeleteLoading(false);
+    }
+  };
+
   return (
     <div className="theme-l5" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <Navbar />
@@ -134,9 +168,30 @@ export default function MijnOpdrachtenPage() {
             <div
               key={opdracht.id}
               className="card round white"
-              style={{ padding: '1rem', cursor: 'pointer' }}
+              style={{ padding: '1rem', cursor: 'pointer', position: 'relative' }}
               onClick={() => openModal(opdracht)}
             >
+              <button
+                onClick={(e) => {
+                  e.stopPropagation();
+                  setDeleteModal(opdracht);
+                }}
+                style={{
+                  position: 'absolute',
+                  top: '50%',
+                  right: '10px',
+                  transform: 'translateY(-50%)',
+                  background: 'red',
+                  color: 'white',
+                  border: 'none',
+                  padding: '0.5rem 1rem',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                  fontSize: '0.9rem',
+                }}
+              >
+                Verwijderen
+              </button>
               <h3>{opdracht.title}</h3>
               <p>{opdracht.description.substring(0, 80)}...</p>
               <p>Deadline: {new Date(opdracht.deadline).toLocaleDateString()}</p>
@@ -316,6 +371,87 @@ export default function MijnOpdrachtenPage() {
                   ))}
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {deleteModal && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 1000,
+          }}
+          onClick={() => setDeleteModal(null)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              backgroundColor: 'white',
+              borderRadius: '8px',
+              maxWidth: '400px',
+              width: '90%',
+              padding: '2rem',
+              position: 'relative',
+            }}
+          >
+            <button
+              onClick={() => setDeleteModal(null)}
+              style={{
+                position: 'absolute',
+                top: '10px',
+                right: '10px',
+                background: 'red',
+                color: 'white',
+                border: 'none',
+                padding: '0.5rem 1rem',
+                borderRadius: '4px',
+                cursor: 'pointer',
+              }}
+            >
+              Sluiten
+            </button>
+
+            <h2>Opdracht Verwijderen</h2>
+            <p>Weet je zeker dat je deze opdracht wilt verwijderen?</p>
+            <p><strong>{deleteModal.title}</strong></p>
+
+            <div style={{ display: 'flex', gap: '1rem', marginTop: '1rem' }}>
+              <button
+                onClick={() => setDeleteModal(null)}
+                style={{
+                  background: 'gray',
+                  color: 'white',
+                  border: 'none',
+                  padding: '0.5rem 1rem',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                }}
+              >
+                Annuleren
+              </button>
+              <button
+                onClick={handleDeleteOpdracht}
+                disabled={deleteLoading}
+                style={{
+                  background: 'red',
+                  color: 'white',
+                  border: 'none',
+                  padding: '0.5rem 1rem',
+                  borderRadius: '4px',
+                  cursor: deleteLoading ? 'not-allowed' : 'pointer',
+                }}
+              >
+                {deleteLoading ? 'Verwijderen...' : 'Verwijderen'}
+              </button>
             </div>
           </div>
         </div>

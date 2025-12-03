@@ -20,7 +20,7 @@ export default async function handler(req, res) {
         o.opbouw_hoogwerkers_type, o.opbouw_hoogwerkers_amount,
         o.afbouw_hoogwerkers_type, o.afbouw_hoogwerkers_amount,
         o.magazijnbon_link, o.project_map_opbouw_link, o.project_map_afbouw_link, o.storageplace_adres,
-        o.created_at, o.status
+        o.created_at, o.status, o.images, o.pdfs
     `;
 
     if (userId) {
