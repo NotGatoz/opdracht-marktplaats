@@ -1,8 +1,10 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useRouter } from 'next/router';
 
 export function Navbar() {
   const [user, setUser] = useState(null);
+  const router = useRouter();
 
   useEffect(() => {
     const storedUser = localStorage.getItem('user');
@@ -18,11 +20,18 @@ export function Navbar() {
 
   const showMijnOpdrachten = user && (user.is_admin || user.is_poster);
 
+  const handleLogout = async () => {
+    await fetch('/api/logout', { method: 'POST' });
+    localStorage.removeItem('user');
+    router.push('/auth/login');
+  };
+
   return (
     <div className="top">
       <div className="bar theme-d2" style={{ display: 'flex', justifyContent: 'space-between' }}>
+        
+        {/* LEFT SIDE */}
         <div>
-          {/* Absolute paths */}
           <Link href="/" className="bar-item button small padding-small theme-d4">
             <i className="fa fa-home margin-right"></i>Startpagina
           </Link>
@@ -48,9 +57,31 @@ export function Navbar() {
           )}
         </div>
 
-        <a href="#" className="bar-item button small hide-small padding-small hover-white">
-          <i className="fa fa-user"></i> Account
-        </a>
+        {/* RIGHT SIDE */}
+        <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
+          <a href="#" className="bar-item button small hide-small padding-small hover-white">
+            <i className="fa fa-user margin-right"></i> Account
+          </a>
+
+          {/* LOGOUT BUTTON */}
+          {user && (
+            <button
+              onClick={handleLogout}
+              className="bar-item button small padding-small theme-d4"
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: '6px',
+                border: 'none',
+                cursor: 'pointer'
+              }}
+            >
+              <i className="fa fa-sign-out"></i>
+              Uitloggen
+            </button>
+          )}
+        </div>
+
       </div>
     </div>
   );

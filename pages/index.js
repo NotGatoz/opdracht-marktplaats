@@ -109,16 +109,6 @@ useEffect(() => {
               </p>
               <p>E-mail: {userData.email}</p>
               <p>Lid sinds {new Date(userData.created_at).toLocaleDateString('nl-NL')}</p>
-              <button
-                className="button block theme-l1"
-                onClick={async () => {
-                  await fetch('/api/logout', { method: 'POST' });
-                  localStorage.removeItem('user');
-                  router.push('/auth/login');
-                }}
-              >
-                Uitloggen
-              </button>
             </div>
           </div>
           <br />
