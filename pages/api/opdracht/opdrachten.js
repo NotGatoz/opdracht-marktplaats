@@ -6,22 +6,55 @@ export default async function handler(req, res) {
   }
 
   try {
-    const result = await pool.query(`
-      SELECT id, user_id, title, description, category, deadline,
-        location_city, location_address, location_postcode,
-        opbouw_date, opbouw_time,
-        hard_opbouw, opbouw_dagen_amount, opbouw_men_needed,
-        planning_afbouw_date, planning_afbouw_time,
-        hard_afbouw, afbouw_dagen_amount, afbouw_men_needed,
-        opbouw_transport_type, opbouw_transport_amount,
-        afbouw_transport_type, afbouw_transport_amount,
-        opbouw_hoogwerkers_type, opbouw_hoogwerkers_amount,
-        afbouw_hoogwerkers_type, afbouw_hoogwerkers_amount,
-        magazijnbon_link, project_map_opbouw_link, project_map_afbouw_link, storageplace_adres,
-        created_at, status
-      FROM opdrachten
-      ORDER BY created_at DESC
-    `);
+    const { userId } = req.query;
+
+    let query = `
+      SELECT o.id, o.user_id, o.title, o.description, o.category, o.deadline,
+        o.location_city, o.location_address, o.location_postcode,
+        o.opbouw_date, o.opbouw_time,
+        o.hard_opbouw, o.opbouw_dagen_amount, o.opbouw_men_needed,
+        o.planning_afbouw_date, o.planning_afbouw_time,
+        o.hard_afbouw, o.afbouw_dagen_amount, o.afbouw_men_needed,
+        o.opbouw_transport_type, o.opbouw_transport_amount,
+        o.afbouw_transport_type, o.afbouw_transport_amount,
+        o.opbouw_hoogwerkers_type, o.opbouw_hoogwerkers_amount,
+        o.afbouw_hoogwerkers_type, o.afbouw_hoogwerkers_amount,
+        o.magazijnbon_link, o.project_map_opbouw_link, o.project_map_afbouw_link, o.storageplace_adres,
+        o.created_at, o.status
+    `;
+
+    if (userId) {
+      query += `,
+        CASE WHEN EXISTS (
+          SELECT 1 FROM bids b WHERE b.opdracht_id = o.id AND b.user_id = $1
+        ) THEN (
+          SELECT COUNT(*) FROM bids b WHERE b.opdracht_id = o.id AND b.user_id = $1
+        ) ELSE 0 END as bid_count
+      `;
+    } else {
+      query += `,
+        COUNT(b.id) as bid_count
+      `;
+    }
+
+    query += `
+      FROM opdrachten o
+    `;
+
+    if (!userId) {
+      query += `
+        LEFT JOIN bids b ON o.id = b.opdracht_id
+      `;
+    }
+
+    query += `
+      GROUP BY o.id
+      ORDER BY o.created_at DESC
+    `;
+
+    const result = userId
+      ? await pool.query(query, [userId])
+      : await pool.query(query);
 
     return res.status(200).json({ opdrachten: result.rows });
   } catch (err) {

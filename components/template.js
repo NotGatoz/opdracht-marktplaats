@@ -81,7 +81,6 @@ export function Navbar() {
             </button>
           )}
         </div>
-
       </div>
     </div>
   );

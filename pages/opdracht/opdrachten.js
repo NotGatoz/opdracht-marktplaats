@@ -11,6 +11,7 @@ export default function OpdrachtenPage() {
   const [bidComment, setBidComment] = useState('');
   const [bids, setBids] = useState([]);
   const [bidLoading, setBidLoading] = useState(false);
+  const [hasBid, setHasBid] = useState(false);
 
   useEffect(() => {
     const fetchUser = () => {
@@ -30,7 +31,9 @@ export default function OpdrachtenPage() {
   useEffect(() => {
     const fetchOpdrachten = async () => {
       try {
-        const res = await fetch('/api/opdracht/opdrachten');
+        const userId = user?.id;
+        const url = userId ? `/api/opdracht/opdrachten?userId=${userId}` : '/api/opdracht/opdrachten';
+        const res = await fetch(url);
         const data = await res.json();
         if (!res.ok) throw new Error(data.error || 'Fout bij ophalen opdrachten');
         setOpdrachten(data.opdrachten);
@@ -40,8 +43,10 @@ export default function OpdrachtenPage() {
         setLoading(false);
       }
     };
-    fetchOpdrachten();
-  }, []);
+    if (user !== null) {
+      fetchOpdrachten();
+    }
+  }, [user]);
 
   const fetchBids = async (opdrachtId) => {
     try {
@@ -49,14 +54,21 @@ export default function OpdrachtenPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Fout bij ophalen biedingen');
       setBids(data.bids);
+      setHasBid(data.bids.some(bid => bid.user_id == user?.id));
     } catch (err) {
       console.error(err.message);
       setBids([]);
+      setHasBid(false);
     }
   };
 
   const handleBidSubmit = async () => {
     if (!newBid || Number(newBid) <= 0) return;
+    // Check if user has already bid to prevent frontend submission
+    if (bids.some(bid => bid.user_id == user?.id)) {
+      alert('Je hebt al een bod geplaatst op deze opdracht');
+      return;
+    }
     setBidLoading(true);
     try {
       const res = await fetch('/api/bids', {
@@ -73,6 +85,7 @@ export default function OpdrachtenPage() {
       if (!res.ok) throw new Error(data.error || 'Fout bij plaatsen bod');
       setNewBid('');
       setBidComment('');
+      fetchBids(selectedOpdracht.id); // Refresh bids after successful submission
     } catch (err) {
       alert(err.message);
     } finally {
@@ -83,6 +96,42 @@ export default function OpdrachtenPage() {
   const openModal = (opdracht) => {
     setSelectedOpdracht(opdracht);
     fetchBids(opdracht.id);
+  };
+
+  const fetchOpdrachten = async () => {
+    try {
+      const userId = user?.id;
+      const url = userId ? `/api/opdracht/opdrachten?userId=${userId}` : '/api/opdracht/opdrachten';
+      const res = await fetch(url);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Fout bij ophalen opdrachten');
+      setOpdrachten(data.opdrachten);
+    } catch (err) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleBidAction = async (action, bidId) => {
+    try {
+      const res = await fetch('/api/bid-actions', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          action,
+          bidId,
+          opdrachtId: selectedOpdracht.id,
+          userId: user?.id,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Fout bij actie');
+      fetchBids(selectedOpdracht.id); // Refresh bids
+      fetchOpdrachten(); // Refresh opdrachten to update "geboden" indicator
+    } catch (err) {
+      alert(err.message);
+    }
   };
 
   return (
@@ -99,13 +148,25 @@ export default function OpdrachtenPage() {
             <div
               key={opdracht.id}
               className="card round white"
-              style={{ padding: '1rem', cursor: 'pointer' }}
+              style={{ padding: '1rem', cursor: 'pointer', position: 'relative' }}
               onClick={() => openModal(opdracht)}
             >
               <h3>{opdracht.title}</h3>
               <p>{opdracht.description.substring(0, 80)}...</p>
               <p>Deadline: {new Date(opdracht.deadline).toLocaleDateString()}</p>
               <p>Status: {opdracht.status}</p>
+              {opdracht.bid_count > 0 && (
+                <div style={{
+                  position: 'absolute',
+                  top: '10px',
+                  right: '10px',
+                  color: 'red',
+                  fontWeight: 'bold',
+                  fontSize: '14px'
+                }}>
+                  geboden
+                </div>
+              )}
             </div>
           ))}
         </div>
@@ -237,29 +298,42 @@ export default function OpdrachtenPage() {
 
             {!user?.is_poster && (
               <div style={{ marginTop: '1rem' }}>
-                <h3>Plaats je bod</h3>
-                <input
-                  type="number"
-                  value={newBid}
-                  onChange={(e) => setNewBid(e.target.value)}
-                  placeholder="Bedrag (€)"
-                  style={{ padding: '0.5rem', width: '100%', marginBottom: '0.5rem', borderRadius: '4px', border: '1px solid #ccc' }}
-                />
-                <textarea
-                  value={bidComment}
-                  onChange={(e) => setBidComment(e.target.value)}
-                  placeholder="Opmerking (optioneel)"
-                  style={{ padding: '0.5rem', width: '100%', marginBottom: '0.5rem', borderRadius: '4px', border: '1px solid #ccc', minHeight: '60px' }}
-                />
-                <button
-                  onClick={handleBidSubmit}
-                  disabled={bidLoading}
-                  style={{ padding: '0.5rem 1rem', backgroundColor: '#51cf66', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
-                >
-                  {bidLoading ? 'Bezig...' : 'Bod plaatsen'}
-                </button>
-
-
+                {hasBid ? (
+                  <button
+                    onClick={() => {
+                      if (confirm('Weet je zeker dat je je bod wilt verwijderen?')) {
+                        handleBidAction('ignore', null);
+                      }
+                    }}
+                    style={{ padding: '0.5rem 1rem', backgroundColor: '#ff6b6b', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                  >
+                    Bod verwijderen
+                  </button>
+                ) : (
+                  <>
+                    <h3>Plaats je bod</h3>
+                    <input
+                      type="number"
+                      value={newBid}
+                      onChange={(e) => setNewBid(e.target.value)}
+                      placeholder="Bedrag (€)"
+                      style={{ padding: '0.5rem', width: '100%', marginBottom: '0.5rem', borderRadius: '4px', border: '1px solid #ccc' }}
+                    />
+                    <textarea
+                      value={bidComment}
+                      onChange={(e) => setBidComment(e.target.value)}
+                      placeholder="Opmerking (optioneel)"
+                      style={{ padding: '0.5rem', width: '100%', marginBottom: '0.5rem', borderRadius: '4px', border: '1px solid #ccc', minHeight: '60px' }}
+                    />
+                    <button
+                      onClick={handleBidSubmit}
+                      disabled={bidLoading}
+                      style={{ padding: '0.5rem 1rem', backgroundColor: '#51cf66', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                    >
+                      {bidLoading ? 'Bezig...' : 'Bod plaatsen'}
+                    </button>
+                  </>
+                )}
               </div>
             )}
           </div>

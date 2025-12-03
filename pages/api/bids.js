@@ -27,12 +27,35 @@ export default async function handler(req, res) {
     }
 
     try {
-      const result = await pool.query(
-        `INSERT INTO bids (opdracht_id, user_id, amount, comment, created_at)
-         VALUES ($1, $2, $3, $4, NOW()) RETURNING *`,
-        [opdrachtId, userId, amount, comment || null]
-      );
-      res.status(201).json({ bid: result.rows[0] });
+      // Use a transaction to check and insert atomically
+      const client = await pool.connect();
+      try {
+        await client.query('BEGIN');
+
+        // Check if the user has already placed a bid on this opdracht
+        const existingBid = await client.query(
+          'SELECT id FROM bids WHERE opdracht_id = $1 AND user_id = $2',
+          [opdrachtId, userId]
+        );
+        if (existingBid.rows.length > 0) {
+          await client.query('ROLLBACK');
+          return res.status(400).json({ error: 'Je hebt al een bod geplaatst op deze opdracht' });
+        }
+
+        const result = await client.query(
+          `INSERT INTO bids (opdracht_id, user_id, amount, comment, created_at)
+           VALUES ($1, $2, $3, $4, NOW()) RETURNING *`,
+          [opdrachtId, userId, amount, comment || null]
+        );
+
+        await client.query('COMMIT');
+        res.status(201).json({ bid: result.rows[0] });
+      } catch (err) {
+        await client.query('ROLLBACK');
+        throw err;
+      } finally {
+        client.release();
+      }
     } catch (err) {
       console.error('Error creating bid:', err);
       res.status(500).json({ error: 'Bieden mislukt' });
