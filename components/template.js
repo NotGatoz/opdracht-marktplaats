@@ -59,7 +59,7 @@ export function Navbar() {
 export function Footer() {
   return (
     <footer className="container theme-d3 padding-16">
-      <h5>Voettekst</h5>
+      <h5>Avontuur</h5>
     </footer>
   );
 }
