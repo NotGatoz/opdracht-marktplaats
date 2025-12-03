@@ -9,11 +9,13 @@
   },
   "dependencies": {
     "bcryptjs": "^2.4.3",
+    "chart.js": "^4.5.1",
     "jsonwebtoken": "^9.0.2",
     "next": "15.5.3",
     "pg": "^8.16.3",
     "postgres": "^3.4.7",
     "react": "19.1.0",
+    "react-chartjs-2": "^5.3.1",
     "react-dom": "19.1.0",
     "supabase": "^2.64.2"
   },
