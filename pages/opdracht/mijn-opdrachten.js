@@ -325,6 +325,45 @@ export default function MijnOpdrachtenPage() {
               </div>
             </div>
 
+            {((selectedOpdracht.images && selectedOpdracht.images.length > 0) || (selectedOpdracht.pdfs && selectedOpdracht.pdfs.length > 0)) && (
+              <div style={{ marginBottom: '1rem' }}>
+                <h4 style={{ marginBottom: '0.5rem', color: '#333' }}>Bijlagen</h4>
+                {selectedOpdracht.images && selectedOpdracht.images.length > 0 && (
+                  <div style={{ marginBottom: '1rem' }}>
+                    <h5>Afbeeldingen:</h5>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                      {selectedOpdracht.images.map((image, index) => (
+                        <img
+                          key={index}
+                          src={`data:image/jpeg;base64,${image}`}
+                          alt={`Afbeelding ${index + 1}`}
+                          style={{ maxWidth: '100px', maxHeight: '100px', objectFit: 'cover', borderRadius: '4px' }}
+                        />
+                      ))}
+                    </div>
+                  </div>
+                )}
+                {selectedOpdracht.pdfs && selectedOpdracht.pdfs.length > 0 && (
+                  <div>
+                    <h5>PDFs:</h5>
+                    <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
+                      {selectedOpdracht.pdfs.map((pdf, index) => (
+                        <a
+                          key={index}
+                          href={`/api/opdracht/pdf?id=${selectedOpdracht.id}&index=${index}`}
+                          target="_blank"
+                          rel="noopener noreferrer"
+                          style={{ padding: '0.5rem 1rem', backgroundColor: '#007bff', color: 'white', textDecoration: 'none', borderRadius: '4px' }}
+                        >
+                          {selectedOpdracht.pdf_filenames && selectedOpdracht.pdf_filenames[index] ? selectedOpdracht.pdf_filenames[index] : `PDF ${index + 1} bekijken`}
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            )}
+
             <div style={{ marginTop: '1rem' }}>
               <h4>Biedingen</h4>
               {selectedOpdracht.status === 'aangenomen' && (

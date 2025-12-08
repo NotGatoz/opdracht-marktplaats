@@ -24,7 +24,7 @@ export default async function handler(req, res) {
         opbouw_hoogwerkers_type, opbouw_hoogwerkers_amount,
         afbouw_hoogwerkers_type, afbouw_hoogwerkers_amount,
         magazijnbon_link, project_map_opbouw_link, project_map_afbouw_link, storageplace_adres,
-        created_at, status
+        created_at, status, images, pdfs, pdf_filenames
       FROM opdrachten
       WHERE user_id = $1
       ORDER BY created_at DESC
