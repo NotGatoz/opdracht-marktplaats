@@ -274,3 +274,37 @@ hr {
   overflow-y: auto;
   padding: 16px;
 }
+
+@media (max-width: 768px) {
+  .profile-sidebar {
+    width: 100%;
+    position: static;
+    height: auto;
+  }
+
+  .container.content {
+    margin-Left: 0;
+  }
+}
+
+.dashboard-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 1rem;
+}
+
+.quick-actions {
+  display: flex;
+  gap: 1rem;
+  flex-wrap: wrap;
+}
+
+.recent-activities ul {
+  list-style: none;
+  padding: 0;
+}
+
+.recent-activities li {
+  padding: 0.5rem 0;
+  border-bottom: 1px solid #eee;
+}

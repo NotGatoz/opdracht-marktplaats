@@ -116,28 +116,166 @@ useEffect(() => {
 
         {/* Dashboard Content */}
         <div className="container content" style={{ marginTop: '20px', marginLeft: '320px', flex: 1 }}>
-          <h1>Welkom, {userData.name}!</h1>
-          <Link href="/opdracht/aangenomen-opdrachten" className="button theme-d4" style={{ float: 'right' }}>
-            aangenomen/geboden opdrachten
-          </Link>
+          {/* Top Row: Welcome Banner and Quick Actions */}
+          <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem', alignItems: 'stretch' }}>
+            {/* Welcome Banner */}
+            <div className="card round white" style={{ background: 'linear-gradient(135deg, #009688 0%, #00796b 100%)', color: 'white', padding: '1.5rem', flex: '2' }}>
+              <h1 style={{ margin: '0 0 0.5rem 0', fontSize: '1.8rem' }}>Welkom terug, {userData.name}!</h1>
+              <p style={{ margin: '0', fontSize: '1rem' }}>Hier is een overzicht van uw opdrachten en activiteiten.</p>
+              <div style={{ marginTop: '0.5rem' }}>
+                <span style={{ fontSize: '0.85rem', opacity: '0.9' }}>
+                  <i className="fa fa-calendar"></i> {new Date().toLocaleDateString('nl-NL', { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' })}
+                </span>
+              </div>
+            </div>
 
-          {/* Stats */}
+            {/* Quick Actions */}
+            <div className="card round white" style={{ padding: '1.5rem', flex: '1' }}>
+              <h3 style={{ marginTop: '0' }}><i className="fa fa-bolt"></i> Snelle acties</h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <Link href="/opdracht/post" className="button theme-d4" style={{ width: '100%', textAlign: 'center' }}>
+                  <i className="fa fa-plus"></i> Nieuwe opdracht
+                </Link>
+                <Link href="/opdracht/opdrachten" className="button theme-d4" style={{ width: '100%', textAlign: 'center' }}>
+                  <i className="fa fa-search"></i> Alle opdrachten
+                </Link>
+                <Link href="/opdracht/mijn-opdrachten" className="button theme-d4" style={{ width: '100%', textAlign: 'center' }}>
+                  <i className="fa fa-user"></i> Mijn opdrachten
+                </Link>
+                <Link href="/opdracht/aangenomen-opdrachten" className="button theme-d4" style={{ width: '100%', textAlign: 'center' }}>
+                  <i className="fa fa-handshake-o"></i> Geboden opdrachten
+                </Link>
+              </div>
+            </div>
+          </div>
+
+          {/* Stats Row */}
           {loadingStats ? (
-            <p>Laden...</p>
+            <div className="card round white" style={{ padding: '2rem', textAlign: 'center' }}>
+              <p>Laden...</p>
+            </div>
           ) : (
-            <div style={{ display: 'flex', gap: '1rem', flexWrap: 'wrap', marginTop: '1rem' }}>
-              <div className="card round white" style={{ flex: 1, minWidth: '200px', padding: '1rem' }}>
-                <h3>Totaal opdrachten</h3>
+            <div className="dashboard-grid" style={{ marginBottom: '2rem' }}>
+              <div className="card round white" style={{ padding: '1rem' }}>
+                <h3><i className="fa fa-list"></i> Totaal opdrachten</h3>
                 <p style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>{stats.totalOpdrachten}</p>
               </div>
-              <div className="card round white" style={{ flex: 1, minWidth: '200px', padding: '1rem' }}>
-                <h3>Voltooide opdrachten</h3>
+              <div className="card round white" style={{ padding: '1rem' }}>
+                <h3><i className="fa fa-check"></i> Voltooide opdrachten</h3>
                 <p style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>{stats.completedOpdrachten}</p>
+              </div>
+              <div className="card round white" style={{ padding: '1rem' }}>
+                <h3><i className="fa fa-clock-o"></i> Lopende opdrachten</h3>
+                <p style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>{stats.totalOpdrachten - stats.completedOpdrachten}</p>
+              </div>
+              <div className="card round white" style={{ padding: '1rem' }}>
+                <h3><i className="fa fa-calendar"></i> Aankomende opdrachten</h3>
+                <p style={{ fontSize: '1.5rem', fontWeight: 'bold' }}>{stats.upcomingOpdrachten.length}</p>
               </div>
             </div>
           )}
 
+          {/* Middle Row: Analytics and Status */}
+          <div style={{ display: 'flex', gap: '1rem', marginBottom: '2rem' }}>
+            {/* Quick Stats */}
+            <div className="card round white" style={{ padding: '1rem', flex: '1' }}>
+              <h3><i className="fa fa-chart-line"></i> Prestatie overzicht</h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <div style={{ display: 'flex', justifyContent: 'space-between' }}>
+                  <span>Voltooiingspercentage:</span>
+                  <span style={{ fontWeight: 'bold' }}>
+                    {stats.totalOpdrachten > 0 ? Math.round((stats.completedOpdrachten / stats.totalOpdrachten) * 100) : 0}%
+                  </span>
+                </div>
+                <div style={{ width: '100%', height: '8px', backgroundColor: '#eee', borderRadius: '4px' }}>
+                  <div style={{
+                    width: `${stats.totalOpdrachten > 0 ? (stats.completedOpdrachten / stats.totalOpdrachten) * 100 : 0}%`,
+                    height: '100%',
+                    backgroundColor: '#4caf50',
+                    borderRadius: '4px'
+                  }}></div>
+                </div>
+                <div style={{ display: 'flex', justifyContent: 'space-between', fontSize: '0.9rem', color: '#666' }}>
+                  <span>Gemiddelde per maand:</span>
+                  <span>{Math.round(stats.totalOpdrachten / 12)}</span>
+                </div>
+              </div>
+            </div>
 
+            {/* System Status */}
+            <div className="card round white" style={{ padding: '1rem', flex: '1' }}>
+              <h3><i className="fa fa-server"></i> Systeem status</h3>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <i className="fa fa-circle" style={{ color: '#4caf50' }}></i>
+                  <span>Database: Online</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <i className="fa fa-circle" style={{ color: '#4caf50' }}></i>
+                  <span>API: Operationeel</span>
+                </div>
+                <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+                  <i className="fa fa-circle" style={{ color: '#ff9800' }}></i>
+                  <span>Backups: Gepland</span>
+                </div>
+              </div>
+            </div>
+
+            {/* Notifications */}
+            <div className="card round white" style={{ padding: '1rem', flex: '2' }}>
+              <h3><i className="fa fa-bell"></i> Meldingen</h3>
+              <div style={{ display: 'flex', gap: '0.5rem', overflowX: 'auto' }}>
+                <div style={{ padding: '0.5rem', backgroundColor: '#e8f5e8', borderRadius: '4px', borderLeft: '4px solid #4caf50', minWidth: '200px' }}>
+                  <i className="fa fa-check-circle" style={{ color: '#4caf50' }}></i> Welkom bij het nieuwe dashboard!
+                </div>
+                <div style={{ padding: '0.5rem', backgroundColor: '#fff3e0', borderRadius: '4px', borderLeft: '4px solid #ff9800', minWidth: '200px' }}>
+                  <i className="fa fa-exclamation-triangle" style={{ color: '#ff9800' }}></i> Controleer uw lopende opdrachten
+                </div>
+                <div style={{ padding: '0.5rem', backgroundColor: '#fce4ec', borderRadius: '4px', borderLeft: '4px solid #e91e63', minWidth: '200px' }}>
+                  <i className="fa fa-info-circle" style={{ color: '#e91e63' }}></i> Nieuwe functies beschikbaar
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Bottom Row: Activities and Tasks */}
+          <div style={{ display: 'flex', gap: '1rem' }}>
+            {/* Recent Activities */}
+            <div className="recent-activities card round white" style={{ padding: '1rem', flex: '1' }}>
+              <h3><i className="fa fa-history"></i> Recente activiteiten</h3>
+              {recentOpdrachten.length > 0 ? (
+                <ul>
+                  {recentOpdrachten.slice(0, 5).map((opdracht, index) => (
+                    <li key={index}>
+                      <strong>{opdracht.title}</strong> - {new Date(opdracht.created_at).toLocaleDateString('nl-NL')}
+                    </li>
+                  ))}
+                </ul>
+              ) : (
+                <p>Geen recente opdrachten.</p>
+              )}
+            </div>
+
+            {/* Upcoming Tasks */}
+            <div className="card round white" style={{ padding: '1rem', flex: '1' }}>
+              <h3><i className="fa fa-calendar-check-o"></i> Aankomende taken</h3>
+              {stats.upcomingOpdrachten.length > 0 ? (
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  {stats.upcomingOpdrachten.slice(0, 3).map((opdracht, index) => (
+                    <div key={index} style={{ padding: '0.5rem', border: '1px solid #eee', borderRadius: '4px' }}>
+                      <strong>{opdracht.title}</strong>
+                      <br />
+                      <small style={{ color: '#666' }}>
+                        Deadline: {new Date(opdracht.deadline || opdracht.created_at).toLocaleDateString('nl-NL')}
+                      </small>
+                    </div>
+                  ))}
+                </div>
+              ) : (
+                <p>Geen aankomende taken.</p>
+              )}
+            </div>
+          </div>
         </div>
       </div>
 

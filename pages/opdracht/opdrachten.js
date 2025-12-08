@@ -12,6 +12,8 @@ export default function OpdrachtenPage() {
   const [bids, setBids] = useState([]);
   const [bidLoading, setBidLoading] = useState(false);
   const [hasBid, setHasBid] = useState(false);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [selectedFilter, setSelectedFilter] = useState('');
 
   useEffect(() => {
     const fetchUser = () => {
@@ -43,9 +45,7 @@ export default function OpdrachtenPage() {
         setLoading(false);
       }
     };
-    if (user !== null) {
-      fetchOpdrachten();
-    }
+    fetchOpdrachten();
   }, [user]);
 
   const fetchBids = async (opdrachtId) => {
@@ -134,6 +134,37 @@ export default function OpdrachtenPage() {
     }
   };
 
+  const filteredOpdrachten = opdrachten
+    .filter((opdracht) => {
+      const matchesSearch = searchQuery === '' ||
+        opdracht.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        opdracht.description.toLowerCase().includes(searchQuery.toLowerCase());
+      if (!matchesSearch) return false;
+
+      switch (selectedFilter) {
+        case 'geboden':
+          return opdracht.total_bid_count > 0;
+        case 'nog niet geboden':
+          return opdracht.total_bid_count == 0; // Use loose equality to handle string "0"
+        case 'ik geboden':
+          return user && opdracht.user_bid_count > 0;
+        case 'nieuw':
+          return true; // Will be sorted later
+        case 'oud':
+          return true; // Will be sorted later
+        default:
+          return true;
+      }
+    })
+    .sort((a, b) => {
+      if (selectedFilter === 'nieuw') {
+        return new Date(b.created_at) - new Date(a.created_at);
+      } else if (selectedFilter === 'oud') {
+        return new Date(a.created_at) - new Date(b.created_at);
+      }
+      return 0; // Default order
+    });
+
   return (
     <div className="theme-l5" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <Navbar />
@@ -143,8 +174,30 @@ export default function OpdrachtenPage() {
         {loading && <p>Laden...</p>}
         {error && <p style={{ color: 'red' }}>{error}</p>}
 
+        <div style={{ marginBottom: '1rem' }}>
+          <input
+            type="text"
+            placeholder="Zoek opdrachten..."
+            value={searchQuery}
+            onChange={(e) => setSearchQuery(e.target.value)}
+            style={{ padding: '0.5rem', width: '100%', marginBottom: '0.5rem', borderRadius: '4px', border: '1px solid #ccc' }}
+          />
+          <select
+            value={selectedFilter}
+            onChange={(e) => setSelectedFilter(e.target.value)}
+            style={{ padding: '0.5rem', width: '100%', borderRadius: '4px', border: '1px solid #ccc' }}
+          >
+            <option value="">Alle opdrachten</option>
+            <option value="geboden">Geboden</option>
+            <option value="nog niet geboden">Nog niet geboden</option>
+            <option value="ik geboden">Ik heb geboden</option>
+            <option value="nieuw">Nieuw</option>
+            <option value="oud">Oud</option>
+          </select>
+        </div>
+
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem' }}>
-          {opdrachten.map((opdracht) => (
+          {filteredOpdrachten.map((opdracht) => (
             <div
               key={opdracht.id}
               className="card round white"
@@ -155,7 +208,7 @@ export default function OpdrachtenPage() {
               <p>{opdracht.description.substring(0, 80)}...</p>
               <p>Deadline: {new Date(opdracht.deadline).toLocaleDateString()}</p>
               <p>Status: {opdracht.status}</p>
-              {opdracht.bid_count > 0 && (
+              {opdracht.total_bid_count > 0 && (
                 <div style={{
                   position: 'absolute',
                   top: '10px',

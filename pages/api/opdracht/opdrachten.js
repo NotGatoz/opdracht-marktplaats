@@ -23,29 +23,33 @@ export default async function handler(req, res) {
         o.created_at, o.status, o.images, o.pdfs, o.pdf_filenames
     `;
 
+    query += `,
+      COALESCE(COUNT(b.id), 0) as total_bid_count,
+      JSON_AGG(
+        JSON_BUILD_OBJECT(
+          'id', b.id,
+          'user_id', b.user_id,
+          'amount', b.amount,
+          'created_at', b.created_at,
+          'comment', b.comment
+        )
+      ) FILTER (WHERE b.id IS NOT NULL) as bids
+    `;
+
     if (userId) {
       query += `,
         CASE WHEN EXISTS (
           SELECT 1 FROM bids b WHERE b.opdracht_id = o.id AND b.user_id = $1
         ) THEN (
           SELECT COUNT(*) FROM bids b WHERE b.opdracht_id = o.id AND b.user_id = $1
-        ) ELSE 0 END as bid_count
-      `;
-    } else {
-      query += `,
-        COUNT(b.id) as bid_count
+        ) ELSE 0 END as user_bid_count
       `;
     }
 
     query += `
       FROM opdrachten o
+      LEFT JOIN bids b ON o.id = b.opdracht_id
     `;
-
-    if (!userId) {
-      query += `
-        LEFT JOIN bids b ON o.id = b.opdracht_id
-      `;
-    }
 
     query += `
       GROUP BY o.id
