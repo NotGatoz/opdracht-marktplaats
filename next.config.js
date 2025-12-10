@@ -1,7 +1,3 @@
 module.exports = {
-  api: {
-    bodyParser: {
-      sizeLimit: '10mb',
-    },
-  },
+  // Removed invalid 'api' configuration - bodyParser should be configured in individual API routes
 }

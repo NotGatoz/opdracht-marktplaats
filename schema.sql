@@ -65,10 +65,47 @@ CREATE TABLE bids (
     comment TEXT
 );
 
+-- Messages table
+CREATE TABLE messages (
+    id SERIAL PRIMARY KEY,
+    opdracht_id INTEGER REFERENCES opdrachten(id) ON DELETE CASCADE,
+    user_id INTEGER REFERENCES users(id) ON DELETE CASCADE,
+    message TEXT NOT NULL,
+    created_at TIMESTAMP WITH TIME ZONE DEFAULT NOW(),
+    is_read BOOLEAN DEFAULT FALSE
+);
+
 -- Indexes for better performance
 CREATE INDEX idx_opdrachten_user_id ON opdrachten(user_id);
 CREATE INDEX idx_opdrachten_status ON opdrachten(status);
 CREATE INDEX idx_opdrachten_deadline ON opdrachten(deadline);
+CREATE INDEX idx_opdrachten_created_at ON opdrachten(created_at);
+CREATE INDEX idx_opdrachten_category ON opdrachten(category);
+CREATE INDEX idx_opdrachten_location_city ON opdrachten(location_city);
+CREATE INDEX idx_opdrachten_accepted_bid_user_id ON opdrachten(accepted_bid_user_id);
 CREATE INDEX idx_bids_opdracht_id ON bids(opdracht_id);
 CREATE INDEX idx_bids_user_id ON bids(user_id);
+CREATE INDEX idx_bids_created_at ON bids(created_at);
 CREATE INDEX idx_users_email ON users(email);
+CREATE INDEX idx_users_status ON users(status);
+CREATE INDEX idx_users_is_admin ON users(is_admin);
+CREATE INDEX idx_users_is_poster ON users(is_poster);
+CREATE INDEX idx_messages_opdracht_id ON messages(opdracht_id);
+CREATE INDEX idx_messages_user_id ON messages(user_id);
+CREATE INDEX idx_messages_created_at ON messages(created_at);
+CREATE INDEX idx_messages_is_read ON messages(is_read);
+
+-- Composite indexes for common query patterns
+CREATE INDEX idx_opdrachten_status_deadline ON opdrachten(status, deadline);
+CREATE INDEX idx_opdrachten_user_status ON opdrachten(user_id, status);
+CREATE INDEX idx_bids_opdracht_user ON bids(opdracht_id, user_id);
+CREATE INDEX idx_messages_opdracht_created ON messages(opdracht_id, created_at DESC);
+CREATE INDEX idx_messages_user_created ON messages(user_id, created_at DESC);
+CREATE INDEX idx_messages_opdracht_user_read ON messages(opdracht_id, user_id, is_read);
+
+-- Partial indexes for better performance on filtered queries
+CREATE INDEX idx_opdrachten_open_status ON opdrachten(status) WHERE status = 'open';
+CREATE INDEX idx_opdrachten_accepted_status ON opdrachten(status) WHERE status = 'accepted';
+CREATE INDEX idx_messages_unread ON messages(user_id, is_read) WHERE is_read = FALSE;
+CREATE INDEX idx_users_active ON users(status) WHERE status = 'active';
+CREATE INDEX idx_users_pending ON users(status) WHERE status = 'pending';

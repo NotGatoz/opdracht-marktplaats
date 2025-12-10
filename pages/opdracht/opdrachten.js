@@ -14,6 +14,10 @@ export default function OpdrachtenPage() {
   const [hasBid, setHasBid] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedFilter, setSelectedFilter] = useState('');
+  const [showMessagePopup, setShowMessagePopup] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState('');
+  const [messageLoading, setMessageLoading] = useState(false);
 
   useEffect(() => {
     const fetchUser = () => {
@@ -133,6 +137,51 @@ export default function OpdrachtenPage() {
       alert(err.message);
     }
   };
+
+  const fetchMessages = async (opdrachtId) => {
+    try {
+      const res = await fetch(`/api/messages/get?opdrachtId=${opdrachtId}`);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Fout bij ophalen berichten');
+      setMessages(data.messages);
+    } catch (err) {
+      console.error(err.message);
+    }
+  };
+
+  const handleSendMessage = async () => {
+    if (!newMessage.trim()) return;
+    setMessageLoading(true);
+    try {
+      const res = await fetch('/api/messages/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          opdrachtId: selectedOpdracht.id,
+          userId: user.id,
+          message: newMessage.trim(),
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Fout bij verzenden bericht');
+      setNewMessage('');
+      fetchMessages(selectedOpdracht.id); // Refresh messages
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setMessageLoading(false);
+    }
+  };
+
+  useEffect(() => {
+    if (showMessagePopup && selectedOpdracht) {
+      fetchMessages(selectedOpdracht.id);
+      const interval = setInterval(() => {
+        fetchMessages(selectedOpdracht.id);
+      }, 5000); // Poll every 5 seconds
+      return () => clearInterval(interval);
+    }
+  }, [showMessagePopup, selectedOpdracht]);
 
   const filteredOpdrachten = opdrachten
     .filter((opdracht) => {
@@ -388,6 +437,17 @@ export default function OpdrachtenPage() {
               </div>
             )}
 
+            {user && user.id !== selectedOpdracht.user_id && (
+              <div style={{ marginBottom: '1rem' }}>
+                <button
+                  onClick={() => setShowMessagePopup(true)}
+                  style={{ padding: '0.5rem 1rem', backgroundColor: '#28a745', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+                >
+                  Contact opdracht plaatser
+                </button>
+              </div>
+            )}
+
             {!user?.is_poster && (
               <div style={{ marginTop: '1rem' }}>
                 {hasBid ? (
@@ -428,6 +488,85 @@ export default function OpdrachtenPage() {
                 )}
               </div>
             )}
+          </div>
+        </div>
+      )}
+
+      {showMessagePopup && selectedOpdracht && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 1001,
+          }}
+          onClick={() => setShowMessagePopup(false)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              backgroundColor: 'white',
+              borderRadius: '8px',
+              maxWidth: '500px',
+              width: '90%',
+              padding: '2rem',
+              position: 'relative',
+              maxHeight: '80vh',
+              overflowY: 'auto',
+            }}
+          >
+            <button
+              onClick={() => setShowMessagePopup(false)}
+              style={{
+                position: 'absolute',
+                top: '10px',
+                right: '10px',
+                background: 'red',
+                color: 'white',
+                border: 'none',
+                padding: '0.5rem 1rem',
+                borderRadius: '4px',
+                cursor: 'pointer',
+              }}
+            >
+              Sluiten
+            </button>
+
+            <h3>Berichten voor {selectedOpdracht.title}</h3>
+
+            <div style={{ marginBottom: '1rem', maxHeight: '300px', overflowY: 'auto', border: '1px solid #ccc', padding: '0.5rem', borderRadius: '4px' }}>
+              {messages.length === 0 ? (
+                <p>Geen berichten nog.</p>
+              ) : (
+                messages.map((msg) => (
+                  <div key={msg.id} style={{ marginBottom: '0.5rem', padding: '0.5rem', backgroundColor: msg.user_id === user?.id ? '#e3f2fd' : '#f5f5f5', borderRadius: '4px' }}>
+                    <strong>{msg.name} {msg.last_name}:</strong> {msg.message}
+                    <br />
+                    <small>{new Date(msg.created_at).toLocaleString()}</small>
+                  </div>
+                ))
+              )}
+            </div>
+
+            <textarea
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              placeholder="Typ je bericht..."
+              style={{ padding: '0.5rem', width: '100%', marginBottom: '0.5rem', borderRadius: '4px', border: '1px solid #ccc', minHeight: '60px' }}
+            />
+            <button
+              onClick={handleSendMessage}
+              disabled={messageLoading}
+              style={{ padding: '0.5rem 1rem', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+            >
+              {messageLoading ? 'Bezig...' : 'Verzenden'}
+            </button>
           </div>
         </div>
       )}
