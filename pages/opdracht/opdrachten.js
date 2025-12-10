@@ -19,6 +19,7 @@ export default function OpdrachtenPage() {
   const [newMessage, setNewMessage] = useState('');
   const [messageLoading, setMessageLoading] = useState(false);
 
+
   useEffect(() => {
     const fetchUser = () => {
       const storedUser = localStorage.getItem('user');
@@ -138,9 +139,15 @@ export default function OpdrachtenPage() {
     }
   };
 
-  const fetchMessages = async (opdrachtId) => {
+  useEffect(() => {
+    if (showMessagePopup && selectedOpdracht) {
+      fetchMessages();
+    }
+  }, [showMessagePopup, selectedOpdracht]);
+
+  const fetchMessages = async () => {
     try {
-      const res = await fetch(`/api/messages/get?opdrachtId=${opdrachtId}`);
+      const res = await fetch(`/api/messages/get?opdrachtId=${selectedOpdracht.id}`);
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Fout bij ophalen berichten');
       setMessages(data.messages);
@@ -158,14 +165,13 @@ export default function OpdrachtenPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           opdrachtId: selectedOpdracht.id,
-          userId: user.id,
-          message: newMessage.trim(),
+          message: newMessage,
         }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Fout bij verzenden bericht');
       setNewMessage('');
-      fetchMessages(selectedOpdracht.id); // Refresh messages
+      fetchMessages(); // Refresh messages
     } catch (err) {
       alert(err.message);
     } finally {
@@ -173,15 +179,7 @@ export default function OpdrachtenPage() {
     }
   };
 
-  useEffect(() => {
-    if (showMessagePopup && selectedOpdracht) {
-      fetchMessages(selectedOpdracht.id);
-      const interval = setInterval(() => {
-        fetchMessages(selectedOpdracht.id);
-      }, 5000); // Poll every 5 seconds
-      return () => clearInterval(interval);
-    }
-  }, [showMessagePopup, selectedOpdracht]);
+
 
   const filteredOpdrachten = opdrachten
     .filter((opdracht) => {
@@ -437,19 +435,16 @@ export default function OpdrachtenPage() {
               </div>
             )}
 
-            {user && user.id !== selectedOpdracht.user_id && (
-              <div style={{ marginBottom: '1rem' }}>
-                <button
-                  onClick={() => setShowMessagePopup(true)}
-                  style={{ padding: '0.5rem 1rem', backgroundColor: '#28a745', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
-                >
-                  Contact opdracht plaatser
-                </button>
-              </div>
-            )}
+
 
             {!user?.is_poster && (
               <div style={{ marginTop: '1rem' }}>
+                <button
+                  onClick={() => setShowMessagePopup(true)}
+                  style={{ padding: '0.5rem 1rem', backgroundColor: '#28a745', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer', marginRight: '0.5rem' }}
+                >
+                  Contact
+                </button>
                 {hasBid ? (
                   <button
                     onClick={() => {
@@ -492,7 +487,7 @@ export default function OpdrachtenPage() {
         </div>
       )}
 
-      {showMessagePopup && selectedOpdracht && (
+      {showMessagePopup && (
         <div
           style={{
             position: 'fixed',
@@ -538,38 +533,25 @@ export default function OpdrachtenPage() {
               Sluiten
             </button>
 
-            <h3>Berichten voor {selectedOpdracht.title}</h3>
-
-            <div style={{ marginBottom: '1rem', maxHeight: '300px', overflowY: 'auto', border: '1px solid #ccc', padding: '0.5rem', borderRadius: '4px' }}>
-              {messages.length === 0 ? (
-                <p>Geen berichten nog.</p>
-              ) : (
-                messages.map((msg) => (
-                  <div key={msg.id} style={{ marginBottom: '0.5rem', padding: '0.5rem', backgroundColor: msg.user_id === user?.id ? '#e3f2fd' : '#f5f5f5', borderRadius: '4px' }}>
-                    <strong>{msg.name} {msg.last_name}:</strong> {msg.message}
-                    <br />
-                    <small>{new Date(msg.created_at).toLocaleString()}</small>
-                  </div>
-                ))
-              )}
-            </div>
+            <h3>Contact Opdrachtgever</h3>
 
             <textarea
               value={newMessage}
               onChange={(e) => setNewMessage(e.target.value)}
               placeholder="Typ je bericht..."
-              style={{ padding: '0.5rem', width: '100%', marginBottom: '0.5rem', borderRadius: '4px', border: '1px solid #ccc', minHeight: '60px' }}
+              style={{ padding: '0.5rem', width: '100%', marginBottom: '0.5rem', borderRadius: '4px', border: '1px solid #ccc', minHeight: '80px' }}
             />
             <button
               onClick={handleSendMessage}
               disabled={messageLoading}
               style={{ padding: '0.5rem 1rem', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
             >
-              {messageLoading ? 'Bezig...' : 'Verzenden'}
+              {messageLoading ? 'Verzenden...' : 'Verzenden'}
             </button>
           </div>
         </div>
       )}
+
     </div>
   );
 }
