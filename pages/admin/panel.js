@@ -316,38 +316,50 @@ export default function AdminPanel() {
     <div className="theme-l5" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <Navbar />
 
-      <div style={{ flex: 1, padding: '2rem', maxWidth: '1400px', margin: '0 auto', width: '100%' }}>
+      <div style={{ flex: 1, padding: '2rem', maxWidth: '1400px', margin: '80px auto 0', width: '100%' }}>
         {/* Header */}
-        <div style={{ marginBottom: '2rem' }}>
-          <h1 style={{ margin: 0, fontSize: '2.5rem', color: '#333' }}>Beheerdashboard</h1>
-          <p style={{ margin: '0.5rem 0 0 0', color: '#666' }}>Welkom terug, {user.name}</p>
+        <div style={{ marginBottom: '3rem' }}>
+          <h1 style={{ margin: 0, fontSize: '3rem', fontWeight: 700, background: 'linear-gradient(135deg, var(--primary) 0%, var(--accent) 100%)', WebkitBackgroundClip: 'text', WebkitTextFillColor: 'transparent', backgroundClip: 'text' }}>Beheerdashboard</h1>
+          <p style={{ margin: '0.75rem 0 0 0', color: 'var(--gray-500)', fontSize: '1.05rem' }}>Welkom terug, <strong>{user.name}</strong></p>
         </div>
 
         {/* USER STAT CARDS */}
         <div style={{
           display: 'grid',
-          gridTemplateColumns: 'repeat(auto-fit, minmax(200px, 1fr))',
+          gridTemplateColumns: 'repeat(auto-fit, minmax(220px, 1fr))',
           gap: '1.5rem',
-          marginBottom: '2rem'
+          marginBottom: '3rem'
         }}>
-          <div className="card round white" style={{ padding: '1.5rem', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
-            <p style={{ margin: 0, fontSize: '0.85rem', color: '#999' }}>Totaal Gebruikers</p>
-            <h2 style={{ margin: '0.5rem 0', fontSize: '2rem', color: '#0066cc' }}>{stats.total}</h2>
+          <div className="card stat-card primary" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--gray-500)', fontWeight: 500 }}>Totaal Gebruikers</p>
+              <h2 style={{ margin: '0.75rem 0 0 0', fontSize: '2.5rem', fontWeight: 700, color: 'var(--primary-light)' }}>{stats.total}</h2>
+            </div>
+            <div style={{ fontSize: '3rem', opacity: 0.2 }}>👥</div>
           </div>
 
-          <div className="card round white" style={{ padding: '1.5rem', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
-            <p style={{ margin: 0, fontSize: '0.85rem', color: '#999' }}>In Afwachting</p>
-            <h2 style={{ margin: '0.5rem 0', fontSize: '2rem', color: '#ffd700' }}>{stats.pending}</h2>
+          <div className="card stat-card warning" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--gray-500)', fontWeight: 500 }}>In Afwachting</p>
+              <h2 style={{ margin: '0.75rem 0 0 0', fontSize: '2.5rem', fontWeight: 700, color: 'var(--warning)' }}>{stats.pending}</h2>
+            </div>
+            <div style={{ fontSize: '3rem', opacity: 0.2 }}>⏳</div>
           </div>
 
-          <div className="card round white" style={{ padding: '1.5rem', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
-            <p style={{ margin: 0, fontSize: '0.85rem', color: '#999' }}>Goedgekeurd</p>
-            <h2 style={{ margin: '0.5rem 0', fontSize: '2rem', color: '#51cf66' }}>{stats.approved}</h2>
+          <div className="card stat-card success" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--gray-500)', fontWeight: 500 }}>Goedgekeurd</p>
+              <h2 style={{ margin: '0.75rem 0 0 0', fontSize: '2.5rem', fontWeight: 700, color: 'var(--success)' }}>{stats.approved}</h2>
+            </div>
+            <div style={{ fontSize: '3rem', opacity: 0.2 }}>✓</div>
           </div>
 
-          <div className="card round white" style={{ padding: '1.5rem', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
-            <p style={{ margin: 0, fontSize: '0.85rem', color: '#999' }}>Beheerders</p>
-            <h2 style={{ margin: '0.5rem 0', fontSize: '2rem', color: '#ff6b6b' }}>{stats.admins}</h2>
+          <div className="card stat-card danger" style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+            <div>
+              <p style={{ margin: 0, fontSize: '0.9rem', color: 'var(--gray-500)', fontWeight: 500 }}>Beheerders</p>
+              <h2 style={{ margin: '0.75rem 0 0 0', fontSize: '2.5rem', fontWeight: 700, color: 'var(--danger)' }}>{stats.admins}</h2>
+            </div>
+            <div style={{ fontSize: '3rem', opacity: 0.2 }}>👑</div>
           </div>
         </div>
 
@@ -355,12 +367,11 @@ export default function AdminPanel() {
         <div
           className="card round white"
           style={{
-            padding: '2rem',
-            marginBottom: '2rem',
-            boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+            padding: '2.5rem',
+            marginBottom: '3rem'
           }}
         >
-          <h2 style={{ marginBottom: '1.5rem' }}>Statistieken Overzicht</h2>
+          <h2 style={{ marginBottom: '2rem', fontSize: '1.5rem', fontWeight: 600, color: 'var(--gray-900)' }}>📊 Statistieken Overzicht</h2>
 
           {statsLoading || !statsData ? (
             <p>Statistieken laden...</p>
@@ -371,9 +382,9 @@ export default function AdminPanel() {
               gap: '1.5rem'
             }}>
               {/* Pie Chart - User Status */}
-              <div className="card round white" style={{ padding: '1rem', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
-                <h3 style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>
-                  Gebruikers Status Verdeling
+              <div className="card round white" style={{ padding: '1.5rem' }}>
+                <h3 style={{ fontSize: '1.05rem', fontWeight: 600, marginBottom: '1rem', color: 'var(--gray-900)' }}>
+                  👤 Gebruikers Status Verdeling
                 </h3>
                 <div style={{ height: '200px', display: 'flex', justifyContent: 'center' }}>
                   <Pie data={userStatusPieChartData} options={{ maintainAspectRatio: false }} />
@@ -381,9 +392,9 @@ export default function AdminPanel() {
               </div>
 
               {/* Line Chart - User Registrations */}
-              <div className="card round white" style={{ padding: '1rem', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
-                <h3 style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>
-                  Gebruikersregistraties per maand
+              <div className="card round white" style={{ padding: '1.5rem' }}>
+                <h3 style={{ fontSize: '1.05rem', fontWeight: 600, marginBottom: '1rem', color: 'var(--gray-900)' }}>
+                  📈 Gebruikersregistraties per maand
                 </h3>
                 <div style={{ height: '200px' }}>
                   <Line data={userRegistrationsChartData} options={{ maintainAspectRatio: false }} />
@@ -391,9 +402,9 @@ export default function AdminPanel() {
               </div>
 
               {/* Line Chart - User Logins */}
-              <div className="card round white" style={{ padding: '1rem', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
-                <h3 style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>
-                  Gebruikers Logins per maand
+              <div className="card round white" style={{ padding: '1.5rem' }}>
+                <h3 style={{ fontSize: '1.05rem', fontWeight: 600, marginBottom: '1rem', color: 'var(--gray-900)' }}>
+                  🔐 Gebruikers Logins per maand
                 </h3>
                 <div style={{ height: '200px' }}>
                   <Line data={userLoginsChartData} options={{ maintainAspectRatio: false }} />
@@ -401,9 +412,9 @@ export default function AdminPanel() {
               </div>
 
               {/* Pie Chart - Opdracht Status */}
-              <div className="card round white" style={{ padding: '1rem', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
-                <h3 style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>
-                  Opdracht Status Verdeling
+              <div className="card round white" style={{ padding: '1.5rem' }}>
+                <h3 style={{ fontSize: '1.05rem', fontWeight: 600, marginBottom: '1rem', color: 'var(--gray-900)' }}>
+                  🎯 Opdracht Status Verdeling
                 </h3>
                 <div style={{ height: '200px', display: 'flex', justifyContent: 'center' }}>
                   <Pie data={pieChartData} options={{ maintainAspectRatio: false }} />
@@ -411,9 +422,9 @@ export default function AdminPanel() {
               </div>
 
               {/* Line Chart - Opdrachten & biedingen */}
-              <div className="card round white" style={{ padding: '1rem', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
-                <h3 style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>
-                  Opdrachten & biedingen per maand
+              <div className="card round white" style={{ padding: '1.5rem' }}>
+                <h3 style={{ fontSize: '1.05rem', fontWeight: 600, marginBottom: '1rem', color: 'var(--gray-900)' }}>
+                  💰 Opdrachten & biedingen per maand
                 </h3>
                 <div style={{ height: '200px' }}>
                   <Line data={lineChartData} options={{ maintainAspectRatio: false }} />
@@ -421,9 +432,9 @@ export default function AdminPanel() {
               </div>
 
               {/* Bar Chart - Top Opdrachten */}
-              <div className="card round white" style={{ padding: '1rem', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
-                <h3 style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>
-                  Top 10 Opdrachten met Hoogste Gemiddelde Bieding
+              <div className="card round white" style={{ padding: '1.5rem', gridColumn: 'span 1' }}>
+                <h3 style={{ fontSize: '1.05rem', fontWeight: 600, marginBottom: '1rem', color: 'var(--gray-900)' }}>
+                  🏆 Top 10 Opdrachten met Hoogste Gemiddelde Bieding
                 </h3>
                 <div style={{ height: '250px' }}>
                   <Bar data={barChartData} options={{ maintainAspectRatio: false }} />
@@ -435,60 +446,67 @@ export default function AdminPanel() {
 
         {/* USER MANAGEMENT */}
         <div className="card round white" style={{
-          padding: '2rem',
-          boxShadow: '0 2px 8px rgba(0,0,0,0.1)'
+          padding: '2.5rem'
         }}>
+          <h2 style={{ marginBottom: '2rem', fontSize: '1.5rem', fontWeight: 600, color: 'var(--gray-900)' }}>👥 Gebruikersbeheer</h2>
+          
           {/* Tabs */}
           <div style={{
             display: 'flex',
-            gap: '1rem',
+            gap: '0.5rem',
             marginBottom: '2rem',
-            borderBottom: '2px solid #e0e0e0',
-            paddingBottom: '1rem'
+            borderBottom: '2px solid var(--gray-200)',
+            paddingBottom: 0
           }}>
             <button
               onClick={() => setActiveTab('pending')}
               style={{
-                padding: '0.7rem 1.5rem',
+                padding: '1rem 1.5rem',
                 border: 'none',
-                backgroundColor: activeTab === 'pending' ? '#ffd700' : 'transparent',
-                color: activeTab === 'pending' ? '#333' : '#999',
+                backgroundColor: 'transparent',
+                borderBottom: activeTab === 'pending' ? '3px solid var(--warning)' : 'none',
+                color: activeTab === 'pending' ? 'var(--warning)' : 'var(--gray-500)',
                 cursor: 'pointer',
-                fontWeight: 'bold',
-                borderRadius: '4px 4px 0 0',
+                fontWeight: activeTab === 'pending' ? 600 : 500,
+                fontSize: '0.95rem',
+                transition: 'all 0.3s ease'
               }}
             >
-              📋 In Afwachting ({stats.pending})
+              ⏳ In Afwachting <span style={{ fontWeight: 700 }}>({stats.pending})</span>
             </button>
 
             <button
               onClick={() => setActiveTab('approved')}
               style={{
-                padding: '0.7rem 1.5rem',
+                padding: '1rem 1.5rem',
                 border: 'none',
-                backgroundColor: activeTab === 'approved' ? '#51cf66' : 'transparent',
-                color: activeTab === 'approved' ? '#fff' : '#999',
+                backgroundColor: 'transparent',
+                borderBottom: activeTab === 'approved' ? '3px solid var(--success)' : 'none',
+                color: activeTab === 'approved' ? 'var(--success)' : 'var(--gray-500)',
                 cursor: 'pointer',
-                fontWeight: 'bold',
-                borderRadius: '4px 4px 0 0',
+                fontWeight: activeTab === 'approved' ? 600 : 500,
+                fontSize: '0.95rem',
+                transition: 'all 0.3s ease'
               }}
             >
-              ✅ Goedgekeurd ({stats.approved})
+              ✅ Goedgekeurd <span style={{ fontWeight: 700 }}>({stats.approved})</span>
             </button>
 
             <button
               onClick={() => setActiveTab('all')}
               style={{
-                padding: '0.7rem 1.5rem',
+                padding: '1rem 1.5rem',
                 border: 'none',
-                backgroundColor: activeTab === 'all' ? '#0066cc' : 'transparent',
-                color: activeTab === 'all' ? '#fff' : '#999',
+                backgroundColor: 'transparent',
+                borderBottom: activeTab === 'all' ? '3px solid var(--primary-light)' : 'none',
+                color: activeTab === 'all' ? 'var(--primary-light)' : 'var(--gray-500)',
                 cursor: 'pointer',
-                fontWeight: 'bold',
-                borderRadius: '4px 4px 0 0',
+                fontWeight: activeTab === 'all' ? 600 : 500,
+                fontSize: '0.95rem',
+                transition: 'all 0.3s ease'
               }}
             >
-              👥 Alle Gebruikers ({stats.total})
+              👥 Alle Gebruikers <span style={{ fontWeight: 700 }}>({stats.total})</span>
             </button>
           </div>
 
@@ -501,13 +519,13 @@ export default function AdminPanel() {
             <div style={{ overflowX: 'auto' }}>
               <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: '0.95rem' }}>
                 <thead>
-                  <tr style={{ borderBottom: '2px solid #0066cc', backgroundColor: '#f5f5f5' }}>
-                    <th style={{ padding: '1rem', fontWeight: 'bold' }}>Naam</th>
-                    <th style={{ padding: '1rem', fontWeight: 'bold' }}>E-mail</th>
-                    <th style={{ padding: '1rem', textAlign: 'center', fontWeight: 'bold' }}>Status</th>
-                    <th style={{ padding: '1rem', textAlign: 'center', fontWeight: 'bold' }}>Rol</th>
-                    <th style={{ padding: '1rem', textAlign: 'center', fontWeight: 'bold' }}>Lid sinds</th>
-                    <th style={{ padding: '1rem', textAlign: 'center', fontWeight: 'bold' }}>Acties</th>
+                  <tr style={{ borderBottom: '2px solid var(--primary-light)', backgroundColor: 'var(--gray-100)' }}>
+                    <th style={{ padding: '1.25rem', fontWeight: 700, color: 'var(--gray-700)', textAlign: 'left' }}>Naam</th>
+                    <th style={{ padding: '1.25rem', fontWeight: 700, color: 'var(--gray-700)', textAlign: 'left' }}>E-mail</th>
+                    <th style={{ padding: '1.25rem', fontWeight: 700, color: 'var(--gray-700)', textAlign: 'center' }}>Status</th>
+                    <th style={{ padding: '1.25rem', fontWeight: 700, color: 'var(--gray-700)', textAlign: 'center' }}>Rol</th>
+                    <th style={{ padding: '1.25rem', fontWeight: 700, color: 'var(--gray-700)', textAlign: 'center' }}>Lid sinds</th>
+                    <th style={{ padding: '1.25rem', fontWeight: 700, color: 'var(--gray-700)', textAlign: 'center' }}>Acties</th>
                   </tr>
                 </thead>
 
@@ -516,15 +534,18 @@ export default function AdminPanel() {
                     <tr
                       key={u.id}
                       style={{
-                        borderBottom: '1px solid #e0e0e0',
-                        backgroundColor: idx % 2 === 0 ? '#fff' : '#fafafa'
+                        borderBottom: '1px solid var(--gray-200)',
+                        backgroundColor: idx % 2 === 0 ? '#fff' : 'var(--gray-100)',
+                        transition: 'background-color 0.2s ease'
                       }}
+                      onMouseEnter={(e) => e.currentTarget.style.backgroundColor = idx % 2 === 0 ? 'var(--gray-100)' : 'var(--gray-200)'}
+                      onMouseLeave={(e) => e.currentTarget.style.backgroundColor = idx % 2 === 0 ? '#fff' : 'var(--gray-100)'}
                     >
                       <td style={{ padding: '1rem' }}>
                         <strong>{u.name} {u.last_name}</strong>
                       </td>
 
-                      <td style={{ padding: '1rem', color: '#0066cc' }}>{u.email}</td>
+                      <td style={{ padding: '1rem', color: 'var(--primary-light)', fontWeight: 500 }}>{u.email}</td>
 
                       <td style={{ padding: '1rem', textAlign: 'center' }}>
                         {getStatusBadge(u.status)}
@@ -533,14 +554,15 @@ export default function AdminPanel() {
                       <td style={{ padding: '1rem', textAlign: 'center' }}>
                         <span
                           style={{
-                            padding: '0.4rem 0.8rem',
-                            borderRadius: '20px',
-                            fontWeight: 'bold',
-                            backgroundColor: u.is_admin ? '#ff6b6b' : '#51cf66',
+                            padding: '0.5rem 1rem',
+                            borderRadius: '24px',
+                            fontWeight: 600,
+                            fontSize: '0.85rem',
+                            backgroundColor: u.is_admin ? 'var(--danger)' : 'var(--success)',
                             color: 'white',
                           }}
                         >
-                          {u.is_admin ? 'Beheerder' : 'Gebruiker'}
+                          {u.is_admin ? '👑 Beheerder' : '👤 Gebruiker'}
                         </span>
                       </td>
 
@@ -566,13 +588,19 @@ export default function AdminPanel() {
                                 onClick={() => handleUserAction(u.id, 'approve')}
                                 disabled={actionLoading === u.id}
                                 style={{
-                                  padding: '0.4rem 0.8rem',
-                                  backgroundColor: '#51cf66',
+                                  padding: '0.5rem 1rem',
+                                  backgroundColor: 'var(--success)',
                                   color: 'white',
                                   border: 'none',
-                                  borderRadius: '4px',
-                                  fontWeight: 'bold',
+                                  borderRadius: '6px',
+                                  fontWeight: 600,
+                                  fontSize: '0.85rem',
+                                  cursor: 'pointer',
+                                  transition: 'var(--transition)',
+                                  opacity: actionLoading === u.id ? 0.6 : 1
                                 }}
+                                onMouseEnter={(e) => !actionLoading && (e.target.style.transform = 'translateY(-2px)', e.target.style.boxShadow = 'var(--shadow-md)')}
+                                onMouseLeave={(e) => (e.target.style.transform = 'translateY(0)', e.target.style.boxShadow = 'none')}
                               >
                                 ✓ Goedkeuren
                               </button>
@@ -581,13 +609,19 @@ export default function AdminPanel() {
                                 onClick={() => handleUserAction(u.id, 'reject')}
                                 disabled={actionLoading === u.id}
                                 style={{
-                                  padding: '0.4rem 0.8rem',
-                                  backgroundColor: '#ff6b6b',
+                                  padding: '0.5rem 1rem',
+                                  backgroundColor: 'var(--danger)',
                                   color: 'white',
                                   border: 'none',
-                                  borderRadius: '4px',
-                                  fontWeight: 'bold',
+                                  borderRadius: '6px',
+                                  fontWeight: 600,
+                                  fontSize: '0.85rem',
+                                  cursor: 'pointer',
+                                  transition: 'var(--transition)',
+                                  opacity: actionLoading === u.id ? 0.6 : 1
                                 }}
+                                onMouseEnter={(e) => !actionLoading && (e.target.style.transform = 'translateY(-2px)', e.target.style.boxShadow = 'var(--shadow-md)')}
+                                onMouseLeave={(e) => (e.target.style.transform = 'translateY(0)', e.target.style.boxShadow = 'none')}
                               >
                                 ✗ Afwijzen
                               </button>
@@ -599,15 +633,21 @@ export default function AdminPanel() {
                               onClick={() => handlePosterRole(u.id, !u.is_poster)}
                               disabled={actionLoading === u.id}
                               style={{
-                                padding: '0.4rem 0.8rem',
-                                border: '2px solid #0066cc',
-                                borderRadius: '4px',
-                                backgroundColor: u.is_poster ? '#51cf66' : 'transparent',
-                                color: u.is_poster ? 'white' : '#0066cc',
-                                fontWeight: 'bold',
+                                padding: '0.5rem 1rem',
+                                border: '2px solid var(--primary-light)',
+                                borderRadius: '6px',
+                                backgroundColor: u.is_poster ? 'var(--success)' : 'transparent',
+                                color: u.is_poster ? 'white' : 'var(--primary-light)',
+                                fontWeight: 600,
+                                fontSize: '0.85rem',
+                                cursor: 'pointer',
+                                transition: 'var(--transition)',
+                                opacity: actionLoading === u.id ? 0.6 : 1
                               }}
+                              onMouseEnter={(e) => !actionLoading && (e.target.style.transform = 'translateY(-2px)', e.target.style.boxShadow = 'var(--shadow-md)')}
+                              onMouseLeave={(e) => (e.target.style.transform = 'translateY(0)', e.target.style.boxShadow = 'none')}
                             >
-                              {u.is_poster ? '❌ Verwijder poster' : '➕ Maak poster'}
+                              {u.is_poster ? '✓ Poster' : '+ Poster'}
                             </button>
                           )}
 
@@ -615,15 +655,21 @@ export default function AdminPanel() {
                             onClick={() => handleUserAction(u.id, 'toggle-admin')}
                             disabled={actionLoading === u.id}
                             style={{
-                              padding: '0.4rem 0.8rem',
-                              border: '2px solid #ff6b6b',
-                              borderRadius: '4px',
+                              padding: '0.5rem 1rem',
+                              border: '2px solid var(--danger)',
+                              borderRadius: '6px',
                               backgroundColor: 'transparent',
-                              color: '#ff6b6b',
-                              fontWeight: 'bold',
+                              color: 'var(--danger)',
+                              fontWeight: 600,
+                              fontSize: '0.85rem',
+                              cursor: 'pointer',
+                              transition: 'var(--transition)',
+                              opacity: actionLoading === u.id ? 0.6 : 1
                             }}
+                            onMouseEnter={(e) => !actionLoading && (e.target.style.transform = 'translateY(-2px)', e.target.style.boxShadow = 'var(--shadow-md)')}
+                            onMouseLeave={(e) => (e.target.style.transform = 'translateY(0)', e.target.style.boxShadow = 'none')}
                           >
-                            {u.is_admin ? '👤 Gebruiker' : '👑 Beheerder'}
+                            {u.is_admin ? '👤' : '👑'}
                           </button>
 
                           <button
@@ -634,14 +680,21 @@ export default function AdminPanel() {
                             }}
                             disabled={actionLoading === u.id}
                             style={{
-                              padding: '0.4rem 0.8rem',
-                              backgroundColor: '#999',
+                              padding: '0.5rem 1rem',
+                              backgroundColor: 'var(--gray-400)',
                               color: 'white',
-                              borderRadius: '4px',
-                              fontWeight: 'bold',
+                              border: 'none',
+                              borderRadius: '6px',
+                              fontWeight: 600,
+                              fontSize: '0.85rem',
+                              cursor: 'pointer',
+                              transition: 'var(--transition)',
+                              opacity: actionLoading === u.id ? 0.6 : 1
                             }}
+                            onMouseEnter={(e) => !actionLoading && (e.target.style.transform = 'translateY(-2px)', e.target.style.boxShadow = 'var(--shadow-md)')}
+                            onMouseLeave={(e) => (e.target.style.transform = 'translateY(0)', e.target.style.boxShadow = 'none')}
                           >
-                            🗑️ Verwijderen
+                            🗑️
                           </button>
                         </div>
                       </td>

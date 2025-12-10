@@ -204,7 +204,7 @@ useEffect(() => {
     <div className="theme-l5" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <Navbar />
 
-      <div style={{ flex: 1, padding: '2rem' }}>
+      <div style={{ flex: 1, padding: '2rem', marginTop: '80px' }}>
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           <h1 style={{ fontSize: '2rem', color: '#333', marginBottom: '2rem' }}>Opdracht Plaatsen</h1>
 

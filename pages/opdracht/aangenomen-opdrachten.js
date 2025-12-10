@@ -97,7 +97,7 @@ export default function AangenomenOpdrachtenPage() {
     <div className="theme-l5" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <Navbar />
 
-      <div style={{ flex: 1, padding: '2rem' }}>
+      <div style={{ flex: 1, padding: '2rem', marginTop: '80px' }}>
         <h1>Geboden en Aangenomen Opdrachten</h1>
         {loading && <p>Laden...</p>}
         {error && <p style={{ color: 'red' }}>{error}</p>}
