@@ -1,3 +1,4 @@
+// /api/messages/recent.js
 import { pool } from '../../../lib/db';
 
 export default async function handler(req, res) {
@@ -8,65 +9,200 @@ export default async function handler(req, res) {
   const { userId } = req.query;
 
   if (!userId) {
-    return res.status(400).json({ error: 'Missing userId parameter' });
+    return res.status(400).json({ error: 'Missing userId' });
   }
 
   try {
-    // Get user info
-    const userQuery = `SELECT is_poster, is_admin FROM users WHERE id = $1`;
+    // Get user role
+    const userQuery = `
+      SELECT is_admin, is_poster 
+      FROM users 
+      WHERE id = $1
+    `;
     const userResult = await pool.query(userQuery, [userId]);
     if (userResult.rows.length === 0) {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    const { is_poster, is_admin } = userResult.rows[0];
+    const { is_admin, is_poster } = userResult.rows[0];
 
-    // Posters & admins: see ALL chatrooms where a worker messaged them
-    if (is_poster || is_admin) {
+    // 1️⃣ Poster/admin: full access to chatrooms they are involved in
+    if (is_admin || is_poster) {
       const query = `
-        SELECT DISTINCT ON (o.id)
-          o.id as opdracht_id, o.title as opdracht_title,
-          m.id as latest_message_id, m.message as latest_message, m.created_at as latest_message_time,
-          u.name, u.last_name,
-          (SELECT COUNT(*) 
-           FROM messages 
-           WHERE opdracht_id = o.id 
-           AND user_id != $1 
-           AND is_read = false) as unread_count
-        FROM messages m
-        JOIN users u ON m.user_id = u.id
-        JOIN opdrachten o ON m.opdracht_id = o.id
+        SELECT
+          o.id AS opdracht_id,
+          o.title AS opdracht_title,
+
+          -- latest message
+          (
+            SELECT message 
+            FROM messages 
+            WHERE opdracht_id = o.id 
+            ORDER BY created_at DESC 
+            LIMIT 1
+          ) AS latest_message,
+
+          (
+            SELECT created_at 
+            FROM messages 
+            WHERE opdracht_id = o.id 
+            ORDER BY created_at DESC 
+            LIMIT 1
+          ) AS latest_message_time,
+
+          -- author of latest message
+          (
+            SELECT name 
+            FROM users 
+            WHERE id = (
+              SELECT user_id 
+              FROM messages 
+              WHERE opdracht_id = o.id 
+              ORDER BY created_at DESC 
+              LIMIT 1
+            )
+          ) AS name,
+
+          (
+            SELECT last_name 
+            FROM users 
+            WHERE id = (
+              SELECT user_id 
+              FROM messages 
+              WHERE opdracht_id = o.id 
+              ORDER BY created_at DESC 
+              LIMIT 1
+            )
+          ) AS last_name,
+
+          -- unread count (messages NOT from current user)
+          (
+            SELECT COUNT(*) 
+            FROM messages 
+            WHERE opdracht_id = o.id
+            AND user_id != $1
+            AND is_read = FALSE
+          ) AS unread_count
+
+        FROM opdrachten o
         WHERE o.id IN (
           SELECT DISTINCT opdracht_id 
           FROM messages 
+          WHERE opdracht_id IN (
+            SELECT DISTINCT opdracht_id
+            FROM messages
+          )
         )
-        ORDER BY o.id, m.created_at DESC
+        ORDER BY 
+          -- unread first
+          (SELECT COUNT(*) 
+           FROM messages 
+           WHERE opdracht_id = o.id
+           AND user_id != $1
+           AND is_read = FALSE) DESC,
+          
+          -- oldest unread → newest unread
+          (SELECT MIN(created_at)
+           FROM messages 
+           WHERE opdracht_id = o.id
+           AND user_id != $1
+           AND is_read = FALSE) ASC NULLS LAST,
+
+          -- lastly sort read messages oldest → newest
+          (SELECT MIN(created_at) 
+           FROM messages 
+           WHERE opdracht_id = o.id) ASC
       `;
+
       const result = await pool.query(query, [userId]);
       return res.status(200).json({ chatrooms: result.rows });
     }
 
-    // Worker: see chatrooms ONLY if poster/admin already replied
+    // 2️⃣ Worker: restricted access — only AFTER poster/admin replies
     const workerQuery = `
-      SELECT DISTINCT ON (o.id)
-        o.id as opdracht_id, o.title as opdracht_title,
-        m.id as latest_message_id, m.message as latest_message, m.created_at as latest_message_time,
-        u.name, u.last_name,
+      SELECT
+        o.id AS opdracht_id,
+        o.title AS opdracht_title,
+
+        (
+          SELECT message 
+          FROM messages 
+          WHERE opdracht_id = o.id 
+          ORDER BY created_at DESC 
+          LIMIT 1
+        ) AS latest_message,
+
+        (
+          SELECT created_at 
+          FROM messages 
+          WHERE opdracht_id = o.id 
+          ORDER BY created_at DESC 
+          LIMIT 1
+        ) AS latest_message_time,
+
+        (
+          SELECT name 
+          FROM users 
+          WHERE id = (
+            SELECT user_id 
+            FROM messages 
+            WHERE opdracht_id = o.id 
+            ORDER BY created_at DESC 
+            LIMIT 1
+          )
+        ) AS name,
+
+        (
+          SELECT last_name 
+          FROM users 
+          WHERE id = (
+            SELECT user_id 
+            FROM messages 
+            WHERE opdracht_id = o.id
+            ORDER BY created_at DESC
+            LIMIT 1
+          )
+        ) AS last_name,
+
+        (
+          SELECT COUNT(*) 
+          FROM messages 
+          WHERE opdracht_id = o.id
+          AND user_id != $1
+          AND is_read = FALSE
+        ) AS unread_count
+
+      FROM opdrachten o
+      WHERE o.id IN (
+
+        -- worker is allowed to see chatroom ONLY if
+        -- poster/admin has replied
+        SELECT opdracht_id
+        FROM messages
+        WHERE opdracht_id IN (
+          SELECT DISTINCT opdracht_id
+          FROM messages
+          WHERE user_id = $1  -- worker sent first message
+        )
+        AND user_id != $1      -- someone else replied
+      )
+
+      ORDER BY 
         (SELECT COUNT(*) 
          FROM messages 
-         WHERE opdracht_id = o.id 
-         AND user_id != $1 
-         AND is_read = false) as unread_count
-      FROM messages m
-      JOIN users u ON m.user_id = u.id
-      JOIN opdrachten o ON m.opdracht_id = o.id
-      WHERE o.id IN (
-        -- Chatrooms where someone ELSE replied to the worker
-        SELECT DISTINCT opdracht_id
-        FROM messages
-        WHERE user_id != $1
-      )
-      ORDER BY o.id, m.created_at DESC
+         WHERE opdracht_id = o.id
+         AND user_id != $1
+         AND is_read = FALSE) DESC,
+
+        (SELECT MIN(created_at)
+         FROM messages 
+         WHERE opdracht_id = o.id
+         AND user_id != $1
+         AND is_read = FALSE) ASC NULLS LAST,
+
+        (SELECT MIN(created_at) 
+         FROM messages 
+         WHERE opdracht_id = o.id) ASC
     `;
 
     const workerResult = await pool.query(workerQuery, [userId]);
@@ -74,6 +210,9 @@ export default async function handler(req, res) {
 
   } catch (err) {
     console.error('Error fetching chatrooms:', err);
-    return res.status(500).json({ error: 'Kan chatrooms niet ophalen', detail: err.message });
+    return res.status(500).json({
+      error: 'Kan chatrooms niet ophalen',
+      detail: err.message
+    });
   }
 }
