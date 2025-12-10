@@ -183,7 +183,7 @@ export default function AdminPanel() {
         fill: true,
       },
       {
-        label: 'Bids',
+        label: 'Biedingen',
         data: statsData.bidsOverTime.map(m => m.count),
         borderColor: '#51cf66',
         backgroundColor: 'rgba(81,207,102,0.3)',
@@ -238,7 +238,7 @@ export default function AdminPanel() {
     datasets: [
       {
         data: statsData.userStatusDistribution.map(s => s.count),
-        backgroundColor: ['#51cf66', '#ff6b6b', '#ffd700', '#0066cc']
+        backgroundColor: ['#ff6b6b', '#51cf66', '#ffd700', '#0066cc']
       }
     ]
   };
@@ -410,10 +410,10 @@ export default function AdminPanel() {
                 </div>
               </div>
 
-              {/* Line Chart - Opdrachten & Bids */}
+              {/* Line Chart - Opdrachten & biedingen */}
               <div className="card round white" style={{ padding: '1rem', boxShadow: '0 2px 8px rgba(0,0,0,0.1)' }}>
                 <h3 style={{ fontSize: '1rem', marginBottom: '0.5rem' }}>
-                  Opdrachten & Bids per maand
+                  Opdrachten & biedingen per maand
                 </h3>
                 <div style={{ height: '200px' }}>
                   <Line data={lineChartData} options={{ maintainAspectRatio: false }} />
