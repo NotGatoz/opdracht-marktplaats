@@ -12,12 +12,12 @@ export default async function handler(req, res) {
   }
 
   try {
-    const query = `
-      UPDATE messages
-      SET is_read = true
-      WHERE user_id = $1 AND opdracht_id = $2 AND is_read = false
-    `;
-    await pool.query(query, [userId, opdrachtId]);
+const query = `
+    UPDATE messages
+    SET is_read = true
+    WHERE user_id != $1 AND opdracht_id = $2 AND is_read = false
+  `;
+  await pool.query(query, [userId, opdrachtId]);
 
     return res.status(200).json({ success: true });
   } catch (err) {

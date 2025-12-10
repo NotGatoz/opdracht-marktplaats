@@ -107,7 +107,7 @@ export function Navbar() {
   };
 
   const handleSendChatMessage = async () => {
-    if (!newChatMessage.trim()) return;
+    if (!newChatMessage.trim() || !user || !selectedChatroom) return;
     setChatLoading(true);
     try {
       const res = await fetch('/api/messages/send', {
@@ -186,28 +186,30 @@ export function Navbar() {
 
         {/* RIGHT SIDE */}
         <div style={{ display: 'flex', alignItems: 'center', gap: '8px' }}>
-          <div style={{ position: 'relative' }}>
-            <i
-              className="fa fa-envelope"
-              onClick={handleNotificationClick}
-              style={{ cursor: 'pointer' }}
-            />
-            {unreadCount > 0 && (
-              <span style={{
-                position: 'absolute',
-                top: '-8px',
-                right: '-8px',
-                backgroundColor: 'red',
-                color: 'white',
-                borderRadius: '50%',
-                padding: '2px 6px',
-                fontSize: '12px',
-                fontWeight: 'bold'
-              }}>
-                {unreadCount}
-              </span>
-            )}
-          </div>
+          {user && (
+            <div style={{ position: 'relative' }}>
+              <i
+                className="fa fa-envelope"
+                onClick={handleNotificationClick}
+                style={{ cursor: 'pointer' }}
+              />
+              {unreadCount > 0 && (
+                <span style={{
+                  position: 'absolute',
+                  top: '-8px',
+                  right: '-8px',
+                  backgroundColor: 'red',
+                  color: 'white',
+                  borderRadius: '50%',
+                  padding: '2px 6px',
+                  fontSize: '12px',
+                  fontWeight: 'bold'
+                }}>
+                  {unreadCount}
+                </span>
+              )}
+            </div>
+          )}
           {showNotifications && (
             <div
               style={{

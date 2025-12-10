@@ -165,6 +165,7 @@ export default function OpdrachtenPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           opdrachtId: selectedOpdracht.id,
+          userId: user.id,
           message: newMessage,
         }),
       });

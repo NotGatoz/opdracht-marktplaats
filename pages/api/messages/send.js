@@ -17,8 +17,8 @@ export default async function handler(req, res) {
       VALUES ($1, $2, $3)
       RETURNING id, opdracht_id, user_id, message, created_at
     `;
-    const result = await pool.query(query, [opdrachtId, userId, message.trim()]);
 
+    const result = await pool.query(query, [opdrachtId, userId, message.trim()]);
     return res.status(201).json({ message: result.rows[0] });
   } catch (err) {
     console.error('Error sending message:', err);
