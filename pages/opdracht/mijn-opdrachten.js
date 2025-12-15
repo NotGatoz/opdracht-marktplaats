@@ -13,6 +13,9 @@ export default function MijnOpdrachtenPage() {
   const [bidLoading, setBidLoading] = useState(false);
   const [deleteModal, setDeleteModal] = useState(null);
   const [deleteLoading, setDeleteLoading] = useState(false);
+  const [editModal, setEditModal] = useState(null);
+  const [editFormData, setEditFormData] = useState({});
+  const [editLoading, setEditLoading] = useState(false);
 
   useEffect(() => {
     const fetchUser = () => {
@@ -154,6 +157,90 @@ export default function MijnOpdrachtenPage() {
     }
   };
 
+  const openEditModal = (opdracht) => {
+    setEditModal(opdracht);
+    setEditFormData({
+      title: opdracht.title || '',
+      description: opdracht.description || '',
+      category: opdracht.category || '',
+      deadline: opdracht.deadline ? opdracht.deadline.split('T')[0] : '',
+      location_address: opdracht.location_address || '',
+      location_city: opdracht.location_city || '',
+      location_postcode: opdracht.location_postcode || '',
+      opbouw_date: opdracht.opbouw_date ? opdracht.opbouw_date.split('T')[0] : '',
+      opbouw_time: opdracht.opbouw_time || '',
+      hard_opbouw: opdracht.hard_opbouw || '',
+      opbouw_dagen_amount: opdracht.opbouw_dagen_amount || '',
+      opbouw_men_needed: opdracht.opbouw_men_needed || '',
+      planning_afbouw_date: opdracht.planning_afbouw_date ? opdracht.planning_afbouw_date.split('T')[0] : '',
+      planning_afbouw_time: opdracht.planning_afbouw_time || '',
+      hard_afbouw: opdracht.hard_afbouw || '',
+      afbouw_dagen_amount: opdracht.afbouw_dagen_amount || '',
+      afbouw_men_needed: opdracht.afbouw_men_needed || '',
+      opbouw_transport_type: opdracht.opbouw_transport_type || '',
+      opbouw_transport_amount: opdracht.opbouw_transport_amount || '',
+      afbouw_transport_type: opdracht.afbouw_transport_type || '',
+      afbouw_transport_amount: opdracht.afbouw_transport_amount || '',
+      opbouw_hoogwerkers_type: opdracht.opbouw_hoogwerkers_type || '',
+      opbouw_hoogwerkers_amount: opdracht.opbouw_hoogwerkers_amount || '',
+      afbouw_hoogwerkers_type: opdracht.afbouw_hoogwerkers_type || '',
+      afbouw_hoogwerkers_amount: opdracht.afbouw_hoogwerkers_amount || '',
+      magazijnbon_link: opdracht.magazijnbon_link || '',
+      project_map_opbouw_link: opdracht.project_map_opbouw_link || '',
+      project_map_afbouw_link: opdracht.project_map_afbouw_link || '',
+      storageplace_adres: opdracht.storageplace_adres || '',
+    });
+  };
+
+  const handleEditChange = (e) => {
+    const { name, value } = e.target;
+    setEditFormData(prev => ({
+      ...prev,
+      [name]: value
+    }));
+  };
+
+  const handleSaveEdit = async () => {
+    if (!editModal) return;
+    setEditLoading(true);
+    try {
+      const res = await fetch('/api/opdracht/update', {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          id: editModal.id,
+          ...editFormData
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Fout bij bijwerken opdracht');
+      
+      // Refresh opdrachten list
+      const fetchOpdrachten = async () => {
+        try {
+          const res = await fetch(`/api/opdracht/mijn-opdrachten?userId=${user.id}`);
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || 'Fout bij ophalen mijn opdrachten');
+          setOpdrachten(data.opdrachten);
+          // Update selectedOpdracht if it's still selected
+          const updatedOpdracht = data.opdrachten.find(op => op.id === editModal.id);
+          if (updatedOpdracht) {
+            setSelectedOpdracht(updatedOpdracht);
+          }
+        } catch (err) {
+          console.error(err.message);
+        }
+      };
+      fetchOpdrachten();
+      setEditModal(null);
+      alert('Opdracht succesvol bijgewerkt!');
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setEditLoading(false);
+    }
+  };
+
   return (
     <div className="theme-l5" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <Navbar />
@@ -171,27 +258,42 @@ export default function MijnOpdrachtenPage() {
               style={{ padding: '1rem', cursor: 'pointer', position: 'relative' }}
               onClick={() => openModal(opdracht)}
             >
-              <button
-                onClick={(e) => {
-                  e.stopPropagation();
-                  setDeleteModal(opdracht);
-                }}
-                style={{
-                  position: 'absolute',
-                  top: '50%',
-                  right: '10px',
-                  transform: 'translateY(-50%)',
-                  background: 'red',
-                  color: 'white',
-                  border: 'none',
-                  padding: '0.5rem 1rem',
-                  borderRadius: '4px',
-                  cursor: 'pointer',
-                  fontSize: '0.9rem',
-                }}
-              >
-                Verwijderen
-              </button>
+              <div style={{ position: 'absolute', top: '10px', right: '10px', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    openEditModal(opdracht);
+                  }}
+                  style={{
+                    background: '#007bff',
+                    color: 'white',
+                    border: 'none',
+                    padding: '0.5rem 1rem',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontSize: '0.9rem',
+                  }}
+                >
+                  Bewerken
+                </button>
+                <button
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    setDeleteModal(opdracht);
+                  }}
+                  style={{
+                    background: 'red',
+                    color: 'white',
+                    border: 'none',
+                    padding: '0.5rem 1rem',
+                    borderRadius: '4px',
+                    cursor: 'pointer',
+                    fontSize: '0.9rem',
+                  }}
+                >
+                  Verwijderen
+                </button>
+              </div>
               <h3>{opdracht.title}</h3>
               <p>{opdracht.description.substring(0, 80)}...</p>
               <p>Deadline: {new Date(opdracht.deadline).toLocaleDateString()}</p>
@@ -410,6 +512,434 @@ export default function MijnOpdrachtenPage() {
                   ))}
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {editModal && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 1000,
+          }}
+          onClick={() => setEditModal(null)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              backgroundColor: 'white',
+              borderRadius: '8px',
+              maxWidth: '600px',
+              width: '90%',
+              padding: '2rem',
+              position: 'relative',
+              maxHeight: '90vh',
+              overflowY: 'auto',
+            }}
+          >
+            <button
+              onClick={() => setEditModal(null)}
+              style={{
+                position: 'absolute',
+                top: '10px',
+                right: '10px',
+                background: 'red',
+                color: 'white',
+                border: 'none',
+                padding: '0.5rem 1rem',
+                borderRadius: '4px',
+                cursor: 'pointer',
+              }}
+            >
+              Sluiten
+            </button>
+
+            <h2>Opdracht Bewerken</h2>
+
+            <div style={{ marginBottom: '1rem' }}>
+              <h4 style={{ marginBottom: '0.5rem', color: '#333' }}>Basis Informatie</h4>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '0.5rem' }}>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 'bold', fontSize: '0.9rem' }}>Titel *</label>
+                  <input
+                    type="text"
+                    name="title"
+                    value={editFormData.title || ''}
+                    onChange={handleEditChange}
+                    style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ddd', boxSizing: 'border-box' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 'bold', fontSize: '0.9rem' }}>Beschrijving *</label>
+                  <textarea
+                    name="description"
+                    value={editFormData.description || ''}
+                    onChange={handleEditChange}
+                    rows="3"
+                    style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ddd', boxSizing: 'border-box', fontFamily: 'inherit' }}
+                  />
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 'bold', fontSize: '0.9rem' }}>Categorie</label>
+                    <input
+                      type="text"
+                      name="category"
+                      value={editFormData.category || ''}
+                      onChange={handleEditChange}
+                      style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ddd', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 'bold', fontSize: '0.9rem' }}>Deadline *</label>
+                    <input
+                      type="date"
+                      name="deadline"
+                      value={editFormData.deadline || ''}
+                      onChange={handleEditChange}
+                      style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ddd', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ marginBottom: '1rem' }}>
+              <h4 style={{ marginBottom: '0.5rem', color: '#333' }}>Locatie</h4>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '0.5rem' }}>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 'bold', fontSize: '0.9rem' }}>Straat en Huisnummer</label>
+                  <input
+                    type="text"
+                    name="location_address"
+                    value={editFormData.location_address || ''}
+                    onChange={handleEditChange}
+                    style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ddd', boxSizing: 'border-box' }}
+                  />
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 'bold', fontSize: '0.9rem' }}>Stad</label>
+                    <input
+                      type="text"
+                      name="location_city"
+                      value={editFormData.location_city || ''}
+                      onChange={handleEditChange}
+                      style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ddd', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 'bold', fontSize: '0.9rem' }}>Postcode</label>
+                    <input
+                      type="text"
+                      name="location_postcode"
+                      value={editFormData.location_postcode || ''}
+                      onChange={handleEditChange}
+                      style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ddd', boxSizing: 'border-box' }}
+                    />
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div style={{ marginBottom: '1rem' }}>
+              <h4 style={{ marginBottom: '0.5rem', color: '#333' }}>Opbouw Tijd</h4>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 'bold', fontSize: '0.9rem' }}>Datum</label>
+                  <input
+                    type="date"
+                    name="opbouw_date"
+                    value={editFormData.opbouw_date || ''}
+                    onChange={handleEditChange}
+                    style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ddd', boxSizing: 'border-box' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 'bold', fontSize: '0.9rem' }}>Tijd</label>
+                  <input
+                    type="time"
+                    name="opbouw_time"
+                    value={editFormData.opbouw_time || ''}
+                    onChange={handleEditChange}
+                    style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ddd', boxSizing: 'border-box' }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div style={{ marginBottom: '1rem' }}>
+              <h4 style={{ marginBottom: '0.5rem', color: '#333' }}>Opbouw Details</h4>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 'bold', fontSize: '0.9rem' }}>Hard Opbouw</label>
+                  <input
+                    type="text"
+                    name="hard_opbouw"
+                    value={editFormData.hard_opbouw || ''}
+                    onChange={handleEditChange}
+                    style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ddd', boxSizing: 'border-box' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 'bold', fontSize: '0.9rem' }}>Dagen Aantal</label>
+                  <input
+                    type="text"
+                    name="opbouw_dagen_amount"
+                    value={editFormData.opbouw_dagen_amount || ''}
+                    onChange={handleEditChange}
+                    style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ddd', boxSizing: 'border-box' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 'bold', fontSize: '0.9rem' }}>Mannen Nodig</label>
+                  <input
+                    type="text"
+                    name="opbouw_men_needed"
+                    value={editFormData.opbouw_men_needed || ''}
+                    onChange={handleEditChange}
+                    style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ddd', boxSizing: 'border-box' }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div style={{ marginBottom: '1rem' }}>
+              <h4 style={{ marginBottom: '0.5rem', color: '#333' }}>Afbouw Details</h4>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 'bold', fontSize: '0.9rem' }}>Datum</label>
+                  <input
+                    type="date"
+                    name="planning_afbouw_date"
+                    value={editFormData.planning_afbouw_date || ''}
+                    onChange={handleEditChange}
+                    style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ddd', boxSizing: 'border-box' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 'bold', fontSize: '0.9rem' }}>Tijd</label>
+                  <input
+                    type="time"
+                    name="planning_afbouw_time"
+                    value={editFormData.planning_afbouw_time || ''}
+                    onChange={handleEditChange}
+                    style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ddd', boxSizing: 'border-box' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 'bold', fontSize: '0.9rem' }}>Hard Afbouw</label>
+                  <input
+                    type="text"
+                    name="hard_afbouw"
+                    value={editFormData.hard_afbouw || ''}
+                    onChange={handleEditChange}
+                    style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ddd', boxSizing: 'border-box' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 'bold', fontSize: '0.9rem' }}>Dagen Aantal</label>
+                  <input
+                    type="text"
+                    name="afbouw_dagen_amount"
+                    value={editFormData.afbouw_dagen_amount || ''}
+                    onChange={handleEditChange}
+                    style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ddd', boxSizing: 'border-box' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 'bold', fontSize: '0.9rem' }}>Mannen Nodig</label>
+                  <input
+                    type="text"
+                    name="afbouw_men_needed"
+                    value={editFormData.afbouw_men_needed || ''}
+                    onChange={handleEditChange}
+                    style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ddd', boxSizing: 'border-box' }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div style={{ marginBottom: '1rem' }}>
+              <h4 style={{ marginBottom: '0.5rem', color: '#333' }}>Transport</h4>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 'bold', fontSize: '0.9rem' }}>Opbouw Type</label>
+                  <input
+                    type="text"
+                    name="opbouw_transport_type"
+                    value={editFormData.opbouw_transport_type || ''}
+                    onChange={handleEditChange}
+                    style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ddd', boxSizing: 'border-box' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 'bold', fontSize: '0.9rem' }}>Opbouw Aantal</label>
+                  <input
+                    type="text"
+                    name="opbouw_transport_amount"
+                    value={editFormData.opbouw_transport_amount || ''}
+                    onChange={handleEditChange}
+                    style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ddd', boxSizing: 'border-box' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 'bold', fontSize: '0.9rem' }}>Afbouw Type</label>
+                  <input
+                    type="text"
+                    name="afbouw_transport_type"
+                    value={editFormData.afbouw_transport_type || ''}
+                    onChange={handleEditChange}
+                    style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ddd', boxSizing: 'border-box' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 'bold', fontSize: '0.9rem' }}>Afbouw Aantal</label>
+                  <input
+                    type="text"
+                    name="afbouw_transport_amount"
+                    value={editFormData.afbouw_transport_amount || ''}
+                    onChange={handleEditChange}
+                    style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ddd', boxSizing: 'border-box' }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div style={{ marginBottom: '1rem' }}>
+              <h4 style={{ marginBottom: '0.5rem', color: '#333' }}>Hoogwerkers</h4>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 'bold', fontSize: '0.9rem' }}>Opbouw Type</label>
+                  <input
+                    type="text"
+                    name="opbouw_hoogwerkers_type"
+                    value={editFormData.opbouw_hoogwerkers_type || ''}
+                    onChange={handleEditChange}
+                    style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ddd', boxSizing: 'border-box' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 'bold', fontSize: '0.9rem' }}>Opbouw Aantal</label>
+                  <input
+                    type="text"
+                    name="opbouw_hoogwerkers_amount"
+                    value={editFormData.opbouw_hoogwerkers_amount || ''}
+                    onChange={handleEditChange}
+                    style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ddd', boxSizing: 'border-box' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 'bold', fontSize: '0.9rem' }}>Afbouw Type</label>
+                  <input
+                    type="text"
+                    name="afbouw_hoogwerkers_type"
+                    value={editFormData.afbouw_hoogwerkers_type || ''}
+                    onChange={handleEditChange}
+                    style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ddd', boxSizing: 'border-box' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 'bold', fontSize: '0.9rem' }}>Afbouw Aantal</label>
+                  <input
+                    type="text"
+                    name="afbouw_hoogwerkers_amount"
+                    value={editFormData.afbouw_hoogwerkers_amount || ''}
+                    onChange={handleEditChange}
+                    style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ddd', boxSizing: 'border-box' }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div style={{ marginBottom: '1rem' }}>
+              <h4 style={{ marginBottom: '0.5rem', color: '#333' }}>Links en Opslag</h4>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '0.5rem' }}>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 'bold', fontSize: '0.9rem' }}>Magazijnbon Link</label>
+                  <input
+                    type="text"
+                    name="magazijnbon_link"
+                    value={editFormData.magazijnbon_link || ''}
+                    onChange={handleEditChange}
+                    placeholder="https://..."
+                    style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ddd', boxSizing: 'border-box' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 'bold', fontSize: '0.9rem' }}>Project Map Opbouw Link</label>
+                  <input
+                    type="text"
+                    name="project_map_opbouw_link"
+                    value={editFormData.project_map_opbouw_link || ''}
+                    onChange={handleEditChange}
+                    placeholder="https://..."
+                    style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ddd', boxSizing: 'border-box' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 'bold', fontSize: '0.9rem' }}>Project Map Afbouw Link</label>
+                  <input
+                    type="text"
+                    name="project_map_afbouw_link"
+                    value={editFormData.project_map_afbouw_link || ''}
+                    onChange={handleEditChange}
+                    placeholder="https://..."
+                    style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ddd', boxSizing: 'border-box' }}
+                  />
+                </div>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 'bold', fontSize: '0.9rem' }}>Storageplace Adres</label>
+                  <input
+                    type="text"
+                    name="storageplace_adres"
+                    value={editFormData.storageplace_adres || ''}
+                    onChange={handleEditChange}
+                    style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ddd', boxSizing: 'border-box' }}
+                  />
+                </div>
+              </div>
+            </div>
+
+            <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
+              <button
+                onClick={() => setEditModal(null)}
+                style={{
+                  flex: 1,
+                  background: 'gray',
+                  color: 'white',
+                  border: 'none',
+                  padding: '0.5rem 1rem',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                }}
+              >
+                Annuleren
+              </button>
+              <button
+                onClick={handleSaveEdit}
+                disabled={editLoading}
+                style={{
+                  flex: 1,
+                  background: '#007bff',
+                  color: 'white',
+                  border: 'none',
+                  padding: '0.5rem 1rem',
+                  borderRadius: '4px',
+                  cursor: editLoading ? 'not-allowed' : 'pointer',
+                }}
+              >
+                {editLoading ? 'Opslaan...' : 'Opslaan'}
+              </button>
             </div>
           </div>
         </div>
