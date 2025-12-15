@@ -16,6 +16,7 @@ export default function MijnOpdrachtenPage() {
   const [editModal, setEditModal] = useState(null);
   const [editFormData, setEditFormData] = useState({});
   const [editLoading, setEditLoading] = useState(false);
+  const [completeLoading, setCompleteLoading] = useState(false);
 
   useEffect(() => {
     const fetchUser = () => {
@@ -238,6 +239,41 @@ export default function MijnOpdrachtenPage() {
       alert(err.message);
     } finally {
       setEditLoading(false);
+    }
+  };
+
+  const handleCompleteOpdracht = async () => {
+    if (!editModal && !selectedOpdracht) return;
+    const opdrachtId = editModal ? editModal.id : selectedOpdracht.id;
+    setCompleteLoading(true);
+    try {
+      const res = await fetch('/api/opdracht/complete', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ id: opdrachtId }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Fout bij voltooien opdracht');
+      
+      // Refresh opdrachten list
+      const fetchOpdrachten = async () => {
+        try {
+          const res = await fetch(`/api/opdracht/mijn-opdrachten?userId=${user.id}`);
+          const data = await res.json();
+          if (!res.ok) throw new Error(data.error || 'Fout bij ophalen mijn opdrachten');
+          setOpdrachten(data.opdrachten);
+        } catch (err) {
+          console.error(err.message);
+        }
+      };
+      fetchOpdrachten();
+      setEditModal(null);
+      setSelectedOpdracht(null);
+      alert('Opdracht is voltooid!');
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setCompleteLoading(false);
     }
   };
 
@@ -512,6 +548,55 @@ export default function MijnOpdrachtenPage() {
                   ))}
                 </div>
               )}
+            </div>
+
+            <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
+              <button
+                onClick={() => setSelectedOpdracht(null)}
+                style={{
+                  flex: 1,
+                  background: 'gray',
+                  color: 'white',
+                  border: 'none',
+                  padding: '0.5rem 1rem',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                }}
+              >
+                Sluiten
+              </button>
+              <button
+                onClick={() => {
+                  openEditModal(selectedOpdracht);
+                  setSelectedOpdracht(null);
+                }}
+                style={{
+                  flex: 1,
+                  background: '#007bff',
+                  color: 'white',
+                  border: 'none',
+                  padding: '0.5rem 1rem',
+                  borderRadius: '4px',
+                  cursor: 'pointer',
+                }}
+              >
+                Bewerken
+              </button>
+              <button
+                onClick={handleCompleteOpdracht}
+                disabled={completeLoading}
+                style={{
+                  flex: 1,
+                  background: '#28a745',
+                  color: 'white',
+                  border: 'none',
+                  padding: '0.5rem 1rem',
+                  borderRadius: '4px',
+                  cursor: completeLoading ? 'not-allowed' : 'pointer',
+                }}
+              >
+                {completeLoading ? 'Voltooiing...' : 'Voltooien'}
+              </button>
             </div>
           </div>
         </div>
@@ -927,7 +1012,7 @@ export default function MijnOpdrachtenPage() {
               </button>
               <button
                 onClick={handleSaveEdit}
-                disabled={editLoading}
+                disabled={editLoading || completeLoading}
                 style={{
                   flex: 1,
                   background: '#007bff',
@@ -935,10 +1020,25 @@ export default function MijnOpdrachtenPage() {
                   border: 'none',
                   padding: '0.5rem 1rem',
                   borderRadius: '4px',
-                  cursor: editLoading ? 'not-allowed' : 'pointer',
+                  cursor: editLoading || completeLoading ? 'not-allowed' : 'pointer',
                 }}
               >
                 {editLoading ? 'Opslaan...' : 'Opslaan'}
+              </button>
+              <button
+                onClick={handleCompleteOpdracht}
+                disabled={completeLoading || editLoading}
+                style={{
+                  flex: 1,
+                  background: '#28a745',
+                  color: 'white',
+                  border: 'none',
+                  padding: '0.5rem 1rem',
+                  borderRadius: '4px',
+                  cursor: completeLoading || editLoading ? 'not-allowed' : 'pointer',
+                }}
+              >
+                {completeLoading ? 'Voltooiing...' : 'Voltooien'}
               </button>
             </div>
           </div>

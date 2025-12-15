@@ -23,9 +23,10 @@ export default async function handler(req, res) {
         INNER JOIN bids b ON o.id = b.opdracht_id
         WHERE b.user_id = $1
         AND NOT (o.accepted_bid_user_id = $1 AND o.status = 'aangenomen')
+        AND o.status != 'voltooid'
       `;
     } else {
-      // Fetch opdrachten where the user has accepted bids (aangenomen)
+      // Fetch opdrachten where the user has accepted bids (aangenomen) - including completed ones
       query = `
         SELECT DISTINCT o.id, o.user_id, o.title, o.description, o.category, o.deadline,
           o.location_city, o.location_address, o.location_postcode,
@@ -40,7 +41,7 @@ export default async function handler(req, res) {
           o.magazijnbon_link, o.project_map_opbouw_link, o.project_map_afbouw_link, o.storageplace_adres,
           o.created_at, o.status, o.images, o.pdfs, o.pdf_filenames
         FROM opdrachten o
-        WHERE o.accepted_bid_user_id = $1 AND o.status = 'aangenomen'
+        WHERE o.accepted_bid_user_id = $1 AND (o.status = 'aangenomen' OR o.status = 'voltooid')
       `;
     }
 

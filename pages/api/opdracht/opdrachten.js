@@ -49,6 +49,7 @@ export default async function handler(req, res) {
     query += `
       FROM opdrachten o
       LEFT JOIN bids b ON o.id = b.opdracht_id
+      WHERE o.status != 'voltooid'
     `;
 
     query += `
