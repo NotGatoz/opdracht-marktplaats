@@ -504,15 +504,19 @@ export default function MijnOpdrachtenPage() {
 
             <div style={{ marginTop: '1rem' }}>
               <h4>Biedingen</h4>
-              {selectedOpdracht.status === 'aangenomen' && (
+              {(selectedOpdracht.status === 'aangenomen' || selectedOpdracht.status === 'voltooid') && (
                 <div style={{ marginBottom: '1rem', padding: '1rem', backgroundColor: '#f0f8f0', border: '1px solid #4CAF50', borderRadius: '4px' }}>
-                  <p style={{ color: 'green', fontWeight: 'bold', margin: '0 0 0.5rem 0' }}>Deze opdracht heeft een toegewezen gebruiker</p>
-                  <button
-                    onClick={() => handleBidAction('remove', null)}
-                    style={{ background: 'red', color: 'white', border: 'none', padding: '0.5rem 1rem', borderRadius: '4px', cursor: 'pointer' }}
-                  >
-                    Ontkoppel aannemer van bod
-                  </button>
+                  <p style={{ color: 'green', fontWeight: 'bold', margin: '0 0 0.5rem 0' }}>
+                    {selectedOpdracht.status === 'voltooid' ? 'Deze opdracht is voltooid' : 'Deze opdracht heeft een toegewezen gebruiker'}
+                  </p>
+                  {selectedOpdracht.status !== 'voltooid' && (
+                    <button
+                      onClick={() => handleBidAction('remove', null)}
+                      style={{ background: 'red', color: 'white', border: 'none', padding: '0.5rem 1rem', borderRadius: '4px', cursor: 'pointer' }}
+                    >
+                      Ontkoppel aannemer van bod
+                    </button>
+                  )}
                 </div>
               )}
               {bids.length === 0 ? (
@@ -522,7 +526,7 @@ export default function MijnOpdrachtenPage() {
                   {bids.map((bid) => (
                     <div key={bid.id} style={{ marginBottom: '0.5rem', padding: '0.5rem', border: '1px solid #ddd', borderRadius: '4px' }}>
                       <p>€{bid.amount} door {bid.user_name} ({new Date(bid.created_at).toLocaleDateString()}){bid.comment && ` - ${bid.comment}`}</p>
-                      {selectedOpdracht.status !== 'aangenomen' && (
+                      {selectedOpdracht.status !== 'aangenomen' && selectedOpdracht.status !== 'voltooid' && (
                         <>
                           <button
                             onClick={() => handleBidAction('accept', bid.id)}
@@ -538,7 +542,7 @@ export default function MijnOpdrachtenPage() {
                           </button>
                         </>
                       )}
-                      {selectedOpdracht.status === 'aangenomen' && selectedOpdracht.accepted_bid_user_id == bid.user_id && (
+                      {(selectedOpdracht.status === 'aangenomen' || selectedOpdracht.status === 'voltooid') && selectedOpdracht.accepted_bid_user_id == bid.user_id && (
                         <p style={{ color: 'green', fontWeight: 'bold' }}>Dit bod is geaccepteerd</p>
                       )}
                       {selectedOpdracht.status === 'aangenomen' && selectedOpdracht.accepted_bid_user_id != bid.user_id && (
@@ -582,21 +586,23 @@ export default function MijnOpdrachtenPage() {
               >
                 Bewerken
               </button>
-              <button
-                onClick={handleCompleteOpdracht}
-                disabled={completeLoading}
-                style={{
-                  flex: 1,
-                  background: '#28a745',
-                  color: 'white',
-                  border: 'none',
-                  padding: '0.5rem 1rem',
-                  borderRadius: '4px',
-                  cursor: completeLoading ? 'not-allowed' : 'pointer',
-                }}
-              >
-                {completeLoading ? 'Voltooiing...' : 'Voltooien'}
-              </button>
+              {selectedOpdracht.status !== 'voltooid' && (
+                <button
+                  onClick={handleCompleteOpdracht}
+                  disabled={completeLoading}
+                  style={{
+                    flex: 1,
+                    background: '#28a745',
+                    color: 'white',
+                    border: 'none',
+                    padding: '0.5rem 1rem',
+                    borderRadius: '4px',
+                    cursor: completeLoading ? 'not-allowed' : 'pointer',
+                  }}
+                >
+                  {completeLoading ? 'Voltooiing...' : 'Voltooien'}
+                </button>
+              )}
             </div>
           </div>
         </div>
@@ -1025,21 +1031,23 @@ export default function MijnOpdrachtenPage() {
               >
                 {editLoading ? 'Opslaan...' : 'Opslaan'}
               </button>
-              <button
-                onClick={handleCompleteOpdracht}
-                disabled={completeLoading || editLoading}
-                style={{
-                  flex: 1,
-                  background: '#28a745',
-                  color: 'white',
-                  border: 'none',
-                  padding: '0.5rem 1rem',
-                  borderRadius: '4px',
-                  cursor: completeLoading || editLoading ? 'not-allowed' : 'pointer',
-                }}
-              >
-                {completeLoading ? 'Voltooiing...' : 'Voltooien'}
-              </button>
+              {editFormData.status !== 'voltooid' && (
+                <button
+                  onClick={handleCompleteOpdracht}
+                  disabled={completeLoading || editLoading}
+                  style={{
+                    flex: 1,
+                    background: '#28a745',
+                    color: 'white',
+                    border: 'none',
+                    padding: '0.5rem 1rem',
+                    borderRadius: '4px',
+                    cursor: completeLoading || editLoading ? 'not-allowed' : 'pointer',
+                  }}
+                >
+                  {completeLoading ? 'Voltooiing...' : 'Voltooien'}
+                </button>
+              )}
             </div>
           </div>
         </div>

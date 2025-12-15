@@ -4,6 +4,7 @@ import { useRouter } from 'next/router';
 
 export function Navbar() {
   const [user, setUser] = useState(null);
+  const [profilePhoto, setProfilePhoto] = useState(null);
   const [unreadCount, setUnreadCount] = useState(0);
   const [chatrooms, setChatrooms] = useState([]);
   const [showNotifications, setShowNotifications] = useState(false);
@@ -19,6 +20,22 @@ export function Navbar() {
       try {
         const userData = JSON.parse(storedUser);
         setUser(userData);
+        // Load profile photo
+        if (userData.id) {
+          fetch(`/api/get-profile-photo?userId=${userData.id}`)
+            .then(res => {
+              if (res.ok) {
+                return res.blob();
+              }
+            })
+            .then(blob => {
+              if (blob) {
+                const url = URL.createObjectURL(blob);
+                setProfilePhoto(url);
+              }
+            })
+            .catch(err => console.error('Error loading profile photo:', err));
+        }
       } catch (err) {
         console.error('Error parsing user:', err);
       }
@@ -368,6 +385,7 @@ export function Navbar() {
             </div>
           )}
           <button
+            onClick={() => router.push('/account')}
             style={{
               backgroundColor: 'rgba(255, 255, 255, 0.2)',
               border: 'none',
@@ -385,7 +403,21 @@ export function Navbar() {
             onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.3)'}
             onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.2)'}
           >
-            <i className="fa fa-user"></i>{user?.name}
+            {profilePhoto && (
+              <img
+                src={profilePhoto}
+                alt="Profiel"
+                style={{
+                  width: '28px',
+                  height: '28px',
+                  borderRadius: '50%',
+                  objectFit: 'cover',
+                  border: '2px solid white',
+                }}
+              />
+            )}
+            {!profilePhoto && <i className="fa fa-user"></i>}
+            <span>{user?.name}</span>
           </button>
 
           {user && (

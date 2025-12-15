@@ -5,6 +5,7 @@ import Link from 'next/link';
 
 export default function Dashboard() {
   const [userData, setUserData] = useState(null);
+  const [profilePhoto, setProfilePhoto] = useState(null);
   const [checkingAuth, setCheckingAuth] = useState(true);
   const [stats, setStats] = useState({
     totalOpdrachten: 0,
@@ -35,6 +36,23 @@ useEffect(() => {
 
       setUserData(parsed);
       setCheckingAuth(false);
+
+      // Load profile photo
+      if (parsed.id) {
+        fetch(`/api/get-profile-photo?userId=${parsed.id}`)
+          .then(res => {
+            if (res.ok) {
+              return res.blob();
+            }
+          })
+          .then(blob => {
+            if (blob) {
+              const url = URL.createObjectURL(blob);
+              setProfilePhoto(url);
+            }
+          })
+          .catch(err => console.error('Error loading profile photo:', err));
+      }
     } catch (err) {
       console.error('Error parsing stored user:', err);
       router.push('/auth/login');
@@ -95,12 +113,21 @@ useEffect(() => {
             <div className="container">
               <h4 className="center">Mijn Profiel</h4>
               <p className="center">
-                <img
-                  src="/w3images/avatar3.png"
-                  className="circle"
-                  style={{ height: '106px', width: '106px' }}
-                  alt="Avatar"
-                />
+                {profilePhoto ? (
+                  <img
+                    src={profilePhoto}
+                    className="circle"
+                    style={{ height: '106px', width: '106px', objectFit: 'cover', border: '3px solid #ddd' }}
+                    alt="Profielfoto"
+                  />
+                ) : (
+                  <img
+                    src="/w3images/avatar3.png"
+                    className="circle"
+                    style={{ height: '106px', width: '106px' }}
+                    alt="Avatar"
+                  />
+                )}
               </p>
               <hr />
               <p>ID: {userData.id}</p>

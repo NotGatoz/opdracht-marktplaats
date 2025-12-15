@@ -12,9 +12,10 @@ export default async function handler(req, res) {
   }
 
   try {
+    // Mark opdracht as completed
     const query = `
       UPDATE opdrachten
-      SET status = 'voltooid', updated_at = NOW()
+      SET status = 'voltooid'
       WHERE id = $1
       RETURNING *
     `;
