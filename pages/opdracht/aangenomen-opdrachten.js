@@ -11,6 +11,10 @@ export default function AangenomenOpdrachtenPage() {
   const [newBid, setNewBid] = useState('');
   const [bids, setBids] = useState([]);
   const [bidLoading, setBidLoading] = useState(false);
+  const [showMessagePopup, setShowMessagePopup] = useState(false);
+  const [messages, setMessages] = useState([]);
+  const [newMessage, setNewMessage] = useState('');
+  const [messageLoading, setMessageLoading] = useState(false);
 
   useEffect(() => {
     const fetchUser = () => {
@@ -91,6 +95,47 @@ export default function AangenomenOpdrachtenPage() {
   const openModal = (opdracht) => {
     setSelectedOpdracht(opdracht);
     fetchBids(opdracht.id);
+  };
+
+  useEffect(() => {
+    if (showMessagePopup && selectedOpdracht) {
+      fetchMessages();
+    }
+  }, [showMessagePopup, selectedOpdracht]);
+
+  const fetchMessages = async () => {
+    try {
+      const res = await fetch(`/api/messages/get?opdrachtId=${selectedOpdracht.id}`);
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Fout bij ophalen berichten');
+      setMessages(data.messages);
+    } catch (err) {
+      console.error(err.message);
+    }
+  };
+
+  const handleSendMessage = async () => {
+    if (!newMessage.trim()) return;
+    setMessageLoading(true);
+    try {
+      const res = await fetch('/api/messages/send', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          opdrachtId: selectedOpdracht.id,
+          userId: user.id,
+          message: newMessage,
+        }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error || 'Fout bij verzenden bericht');
+      setNewMessage('');
+      fetchMessages();
+    } catch (err) {
+      alert(err.message);
+    } finally {
+      setMessageLoading(false);
+    }
   };
 
   return (
@@ -323,9 +368,84 @@ export default function AangenomenOpdrachtenPage() {
                 </ul>
               )}
             </div>
+
+            <div style={{ marginTop: '1rem' }}>
+              <button
+                onClick={() => setShowMessagePopup(true)}
+                style={{ padding: '0.5rem 1rem', backgroundColor: '#28a745', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+              >
+                Contact
+              </button>
+            </div>
           </div>
         </div>
       )}
+
+      {showMessagePopup && (
+        <div
+          style={{
+            position: 'fixed',
+            top: 0,
+            left: 0,
+            width: '100%',
+            height: '100%',
+            backgroundColor: 'rgba(0,0,0,0.5)',
+            display: 'flex',
+            justifyContent: 'center',
+            alignItems: 'center',
+            zIndex: 1001,
+          }}
+          onClick={() => setShowMessagePopup(false)}
+        >
+          <div
+            onClick={(e) => e.stopPropagation()}
+            style={{
+              backgroundColor: 'white',
+              borderRadius: '8px',
+              maxWidth: '500px',
+              width: '90%',
+              padding: '2rem',
+              position: 'relative',
+              maxHeight: '80vh',
+              overflowY: 'auto',
+            }}
+          >
+            <button
+              onClick={() => setShowMessagePopup(false)}
+              style={{
+                position: 'absolute',
+                top: '10px',
+                right: '10px',
+                background: 'red',
+                color: 'white',
+                border: 'none',
+                padding: '0.5rem 1rem',
+                borderRadius: '4px',
+                cursor: 'pointer',
+              }}
+            >
+              Sluiten
+            </button>
+
+            <h3>Contact Opdrachtgever</h3>
+
+            <textarea
+              value={newMessage}
+              onChange={(e) => setNewMessage(e.target.value)}
+              placeholder="Typ je bericht..."
+              style={{ padding: '0.5rem', width: '100%', marginBottom: '0.5rem', borderRadius: '4px', border: '1px solid #ccc', minHeight: '80px' }}
+            />
+            <button
+              onClick={handleSendMessage}
+              disabled={messageLoading}
+              style={{ padding: '0.5rem 1rem', backgroundColor: '#007bff', color: 'white', border: 'none', borderRadius: '4px', cursor: 'pointer' }}
+            >
+              {messageLoading ? 'Verzenden...' : 'Verzenden'}
+            </button>
+          </div>
+        </div>
+      )}
+
     </div>
   );
 }

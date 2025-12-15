@@ -423,7 +423,7 @@ export function Footer() {
       <div style={{ maxWidth: '1400px', margin: '0 auto' }}>
         <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '2rem', marginBottom: '2rem' }}>
           <div>
-            <h4 style={{ marginTop: 0, fontSize: '1.2rem', fontWeight: 700, marginBottom: '1rem' }}>🚀 Avontuur</h4>
+            <h4 style={{ marginTop: 0, fontSize: '1.2rem', fontWeight: 700, marginBottom: '1rem' }}>Avontuur</h4>
             <p style={{ margin: 0, opacity: 0.9, fontSize: '0.95rem', lineHeight: 1.6 }}>Een moderne marktplaats voor het plaatsen en vinden van opdrachten.</p>
           </div>
           <div>
