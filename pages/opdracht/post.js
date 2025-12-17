@@ -208,446 +208,448 @@ useEffect(() => {
         <div style={{ maxWidth: '1200px', margin: '0 auto' }}>
           <h1 style={{ fontSize: '2rem', color: '#333', marginBottom: '2rem' }}>Opdracht Plaatsen</h1>
 
-          <div className="card round white" style={{ padding: '2rem', boxShadow: '0 4px 12px rgba(0,0,0,0.1)' }}>
-            <form onSubmit={handleSubmit}>
-              {/* Basisinformatie and Locatie side by side */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', marginBottom: '2rem' }}>
-                <div>
-                  <h3 style={{ marginBottom: '1rem', color: '#333' }}>Basisinformatie</h3>
-                  <div style={{ marginBottom: '1rem' }}>
-                    <label htmlFor="title"><b>Titel *</b></label>
+          <form onSubmit={handleSubmit}>
+            {/* Basisinformatie */}
+            <div style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: '8px', marginBottom: '1.5rem', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' }}>
+                <h3 style={{ marginTop: 0, marginBottom: '1rem', color: '#333' }}>Basisinformatie</h3>
+                <div style={{ marginBottom: '1rem' }}>
+                  <label htmlFor="title"><b>Titel *</b></label>
+                  <input
+                    type="text"
+                    placeholder="Titel van de opdracht"
+                    name="title"
+                    value={formData.title}
+                    onChange={handleChange}
+                    required
+                    style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+                  />
+                </div>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                  <div>
+                    <label htmlFor="category"><b>Categorie</b></label>
                     <input
                       type="text"
-                      placeholder="Titel van de opdracht"
-                      name="title"
-                      value={formData.title}
+                      placeholder="Categorie"
+                      name="category"
+                      value={formData.category}
+                      onChange={handleChange}
+                      style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="deadline"><b>Deadline *</b></label>
+                    <input
+                      type="date"
+                      name="deadline"
+                      value={formData.deadline}
                       onChange={handleChange}
                       required
                       style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
                     />
                   </div>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
-                    <div>
-                      <label htmlFor="category"><b>Categorie</b></label>
-                      <input
-                        type="text"
-                        placeholder="Categorie"
-                        name="category"
-                        value={formData.category}
-                        onChange={handleChange}
-                        style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="deadline"><b>Deadline *</b></label>
-                      <input
-                        type="date"
-                        name="deadline"
-                        value={formData.deadline}
-                        onChange={handleChange}
-                        required
-                        style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
-                      />
-                    </div>
-                  </div>
                 </div>
+              </div>
 
-                <div>
-                  <h3 style={{ marginBottom: '1rem', color: '#333' }}>Locatie</h3>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
-                    <div>
-                      <label htmlFor="location_city"><b>Stad</b></label>
-                      <input
-                        type="text"
-                        placeholder="Stad"
-                        name="location_city"
-                        value={formData.location_city}
-                        onChange={handleChange}
-                        style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="location_address"><b>Adres</b></label>
-                      <input
-                        type="text"
-                        placeholder="Adres"
-                        name="location_address"
-                        value={formData.location_address}
-                        onChange={handleChange}
-                        style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="location_postcode"><b>Postcode</b></label>
-                      <input
-                        type="text"
-                        placeholder="Postcode"
-                        name="location_postcode"
-                        value={formData.location_postcode}
-                        onChange={handleChange}
-                        style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
-                      />
-                    </div>
+              {/* Locatie */}
+              <div style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: '8px', marginBottom: '1.5rem', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' }}>
+                <h3 style={{ marginTop: 0, marginBottom: '1rem', color: '#333' }}>Locatie</h3>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
+                  <div>
+                    <label htmlFor="location_city"><b>Stad</b></label>
+                    <input
+                      type="text"
+                      placeholder="Stad"
+                      name="location_city"
+                      value={formData.location_city}
+                      onChange={handleChange}
+                      style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="location_address"><b>Adres</b></label>
+                    <input
+                      type="text"
+                      placeholder="Adres"
+                      name="location_address"
+                      value={formData.location_address}
+                      onChange={handleChange}
+                      style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="location_postcode"><b>Postcode</b></label>
+                    <input
+                      type="text"
+                      placeholder="Postcode"
+                      name="location_postcode"
+                      value={formData.location_postcode}
+                      onChange={handleChange}
+                      style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+                    />
                   </div>
                 </div>
               </div>
 
-              {/* Opbouw en Afbouw */}
-              <h3 style={{ marginBottom: '1rem', color: '#333' }}>Opbouw en Afbouw</h3>
-
-              {/* Opbouw and Afbouw side by side */}
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '2rem', marginBottom: '2rem' }}>
-                <div>
-                  <h4 style={{ marginBottom: '1rem', color: '#555' }}>Opbouw</h4>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
-                    <div>
-                      <label htmlFor="hard_opbouw"><b>Hard Opbouw (Ja/Nee)</b></label>
-                      <select
-                        name="hard_opbouw"
-                        value={formData.hard_opbouw}
-                        onChange={handleChange}
-                        style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
-                      >
-                        <option value="">Selecteer</option>
-                        <option value="Ja">Ja</option>
-                        <option value="Nee">Nee</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label htmlFor="opbouw_date"><b>Opbouw Datum</b></label>
-                      <input
-                        type="date"
-                        name="opbouw_date"
-                        value={formData.opbouw_date}
-                        onChange={handleChange}
-                        style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="opbouw_time"><b>Opbouw Tijd</b></label>
-                      <input
-                        type="time"
-                        name="opbouw_time"
-                        value={formData.opbouw_time}
-                        onChange={handleChange}
-                        style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="opbouw_dagen_amount"><b>Opbouw Dagen Aantal</b></label>
-                      <input
-                        type="number"
-                        placeholder="Aantal dagen"
-                        name="opbouw_dagen_amount"
-                        value={formData.opbouw_dagen_amount}
-                        onChange={handleChange}
-                        style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
-                      />
-                    </div>
-                    <div style={{ gridColumn: 'span 2' }}>
-                      <label htmlFor="opbouw_men_needed"><b>Opbouw Mannen Nodig</b></label>
-                      <input
-                        type="number"
-                        placeholder="Aantal mannen"
-                        name="opbouw_men_needed"
-                        value={formData.opbouw_men_needed}
-                        onChange={handleChange}
-                        style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
-                      />
-                    </div>
+              {/* Opbouw */}
+              <div style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: '8px', marginBottom: '1.5rem', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' }}>
+                <h3 style={{ marginTop: 0, marginBottom: '1rem', color: '#333' }}>Opbouw</h3>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                  <div>
+                    <label htmlFor="hard_opbouw"><b>Hard Opbouw (Ja/Nee)</b></label>
+                    <select
+                      name="hard_opbouw"
+                      value={formData.hard_opbouw}
+                      onChange={handleChange}
+                      style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+                    >
+                      <option value="">Selecteer</option>
+                      <option value="Ja">Ja</option>
+                      <option value="Nee">Nee</option>
+                    </select>
                   </div>
-
-                  <h5 style={{ marginBottom: '1rem', color: '#666' }}>Transport Opbouw</h5>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
-                    <div>
-                      <label htmlFor="opbouw_transport_type"><b>Type</b></label>
-                      <input
-                        type="text"
-                        placeholder="Transport type"
-                        name="opbouw_transport_type"
-                        value={formData.opbouw_transport_type}
-                        onChange={handleChange}
-                        style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="opbouw_transport_amount"><b>Aantal</b></label>
-                      <input
-                        type="number"
-                        placeholder="Aantal"
-                        name="opbouw_transport_amount"
-                        value={formData.opbouw_transport_amount}
-                        onChange={handleChange}
-                        style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
-                      />
-                    </div>
+                  <div>
+                    <label htmlFor="opbouw_date"><b>Opbouw Datum</b></label>
+                    <input
+                      type="date"
+                      name="opbouw_date"
+                      value={formData.opbouw_date}
+                      onChange={handleChange}
+                      style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+                    />
                   </div>
-
-                  <h5 style={{ marginBottom: '1rem', color: '#666' }}>Hoogwerkers Opbouw</h5>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
-                    <div>
-                      <label htmlFor="opbouw_hoogwerkers_type"><b>Type</b></label>
-                      <input
-                        type="text"
-                        placeholder="Hoogwerkers type"
-                        name="opbouw_hoogwerkers_type"
-                        value={formData.opbouw_hoogwerkers_type}
-                        onChange={handleChange}
-                        style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="opbouw_hoogwerkers_amount"><b>Aantal</b></label>
-                      <input
-                        type="number"
-                        placeholder="Aantal"
-                        name="opbouw_hoogwerkers_amount"
-                        value={formData.opbouw_hoogwerkers_amount}
-                        onChange={handleChange}
-                        style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
-                      />
-                    </div>
+                  <div>
+                    <label htmlFor="opbouw_time"><b>Opbouw Tijd</b></label>
+                    <input
+                      type="time"
+                      name="opbouw_time"
+                      value={formData.opbouw_time}
+                      onChange={handleChange}
+                      style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="opbouw_dagen_amount"><b>Opbouw Dagen Aantal</b></label>
+                    <input
+                      type="number"
+                      placeholder="Aantal dagen"
+                      name="opbouw_dagen_amount"
+                      value={formData.opbouw_dagen_amount}
+                      onChange={handleChange}
+                      style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+                    />
+                  </div>
+                  <div style={{ gridColumn: 'span 2' }}>
+                    <label htmlFor="opbouw_men_needed"><b>Opbouw Mannen Nodig</b></label>
+                    <input
+                      type="number"
+                      placeholder="Aantal mannen"
+                      name="opbouw_men_needed"
+                      value={formData.opbouw_men_needed}
+                      onChange={handleChange}
+                      style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+                    />
                   </div>
                 </div>
 
-                <div>
-                  <h4 style={{ marginBottom: '1rem', color: '#555' }}>Afbouw</h4>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
-                    <div>
-                      <label htmlFor="hard_afbouw"><b>Hard Afbouw (Ja/Nee)</b></label>
-                      <select
-                        name="hard_afbouw"
-                        value={formData.hard_afbouw}
-                        onChange={handleChange}
-                        style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
-                      >
-                        <option value="">Selecteer</option>
-                        <option value="Ja">Ja</option>
-                        <option value="Nee">Nee</option>
-                      </select>
-                    </div>
-                    <div>
-                      <label htmlFor="planning_afbouw_date"><b>Afbouw Datum</b></label>
-                      <input
-                        type="date"
-                        name="planning_afbouw_date"
-                        value={formData.planning_afbouw_date}
-                        onChange={handleChange}
-                        style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="planning_afbouw_time"><b>Afbouw Tijd</b></label>
-                      <input
-                        type="time"
-                        name="planning_afbouw_time"
-                        value={formData.planning_afbouw_time}
-                        onChange={handleChange}
-                        style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="afbouw_dagen_amount"><b>Afbouw Dagen Aantal</b></label>
-                      <input
-                        type="number"
-                        placeholder="Aantal dagen"
-                        name="afbouw_dagen_amount"
-                        value={formData.afbouw_dagen_amount}
-                        onChange={handleChange}
-                        style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
-                      />
-                    </div>
-                    <div style={{ gridColumn: 'span 2' }}>
-                      <label htmlFor="afbouw_men_needed"><b>Afbouw Mannen Nodig</b></label>
-                      <input
-                        type="number"
-                        placeholder="Aantal mannen"
-                        name="afbouw_men_needed"
-                        value={formData.afbouw_men_needed}
-                        onChange={handleChange}
-                        style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
-                      />
-                    </div>
+                <h4 style={{ marginTop: '1.5rem', marginBottom: '1rem', color: '#555' }}>Transport Opbouw</h4>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                  <div>
+                    <label htmlFor="opbouw_transport_type"><b>Type</b></label>
+                    <input
+                      type="text"
+                      placeholder="Transport type"
+                      name="opbouw_transport_type"
+                      value={formData.opbouw_transport_type}
+                      onChange={handleChange}
+                      style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+                    />
                   </div>
-
-                  <h5 style={{ marginBottom: '1rem', color: '#666' }}>Transport Afbouw</h5>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
-                    <div>
-                      <label htmlFor="afbouw_transport_type"><b>Type</b></label>
-                      <input
-                        type="text"
-                        placeholder="Transport type"
-                        name="afbouw_transport_type"
-                        value={formData.afbouw_transport_type}
-                        onChange={handleChange}
-                        style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="afbouw_transport_amount"><b>Aantal</b></label>
-                      <input
-                        type="number"
-                        placeholder="Aantal"
-                        name="afbouw_transport_amount"
-                        value={formData.afbouw_transport_amount}
-                        onChange={handleChange}
-                        style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
-                      />
-                    </div>
+                  <div>
+                    <label htmlFor="opbouw_transport_amount"><b>Aantal</b></label>
+                    <input
+                      type="number"
+                      placeholder="Aantal"
+                      name="opbouw_transport_amount"
+                      value={formData.opbouw_transport_amount}
+                      onChange={handleChange}
+                      style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+                    />
                   </div>
+                </div>
 
-                  <h5 style={{ marginBottom: '1rem', color: '#666' }}>Hoogwerkers Afbouw</h5>
-                  <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
-                    <div>
-                      <label htmlFor="afbouw_hoogwerkers_type"><b>Type</b></label>
-                      <input
-                        type="text"
-                        placeholder="Hoogwerkers type"
-                        name="afbouw_hoogwerkers_type"
-                        value={formData.afbouw_hoogwerkers_type}
-                        onChange={handleChange}
-                        style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
-                      />
-                    </div>
-                    <div>
-                      <label htmlFor="afbouw_hoogwerkers_amount"><b>Aantal</b></label>
-                      <input
-                        type="number"
-                        placeholder="Aantal"
-                        name="afbouw_hoogwerkers_amount"
-                        value={formData.afbouw_hoogwerkers_amount}
-                        onChange={handleChange}
-                        style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
-                      />
-                    </div>
+                <h4 style={{ marginTop: '1.5rem', marginBottom: '1rem', color: '#555' }}>Hoogwerkers Opbouw</h4>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                  <div>
+                    <label htmlFor="opbouw_hoogwerkers_type"><b>Type</b></label>
+                    <input
+                      type="text"
+                      placeholder="Hoogwerkers type"
+                      name="opbouw_hoogwerkers_type"
+                      value={formData.opbouw_hoogwerkers_type}
+                      onChange={handleChange}
+                      style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="opbouw_hoogwerkers_amount"><b>Aantal</b></label>
+                    <input
+                      type="number"
+                      placeholder="Aantal"
+                      name="opbouw_hoogwerkers_amount"
+                      value={formData.opbouw_hoogwerkers_amount}
+                      onChange={handleChange}
+                      style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+                    />
+                  </div>
+                </div>
+              </div>
+
+              {/* Afbouw */}
+              <div style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: '8px', marginBottom: '1.5rem', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' }}>
+                <h3 style={{ marginTop: 0, marginBottom: '1rem', color: '#333' }}>Afbouw</h3>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                  <div>
+                    <label htmlFor="hard_afbouw"><b>Hard Afbouw (Ja/Nee)</b></label>
+                    <select
+                      name="hard_afbouw"
+                      value={formData.hard_afbouw}
+                      onChange={handleChange}
+                      style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+                    >
+                      <option value="">Selecteer</option>
+                      <option value="Ja">Ja</option>
+                      <option value="Nee">Nee</option>
+                    </select>
+                  </div>
+                  <div>
+                    <label htmlFor="planning_afbouw_date"><b>Afbouw Datum</b></label>
+                    <input
+                      type="date"
+                      name="planning_afbouw_date"
+                      value={formData.planning_afbouw_date}
+                      onChange={handleChange}
+                      style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="planning_afbouw_time"><b>Afbouw Tijd</b></label>
+                    <input
+                      type="time"
+                      name="planning_afbouw_time"
+                      value={formData.planning_afbouw_time}
+                      onChange={handleChange}
+                      style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="afbouw_dagen_amount"><b>Afbouw Dagen Aantal</b></label>
+                    <input
+                      type="number"
+                      placeholder="Aantal dagen"
+                      name="afbouw_dagen_amount"
+                      value={formData.afbouw_dagen_amount}
+                      onChange={handleChange}
+                      style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+                    />
+                  </div>
+                  <div style={{ gridColumn: 'span 2' }}>
+                    <label htmlFor="afbouw_men_needed"><b>Afbouw Mannen Nodig</b></label>
+                    <input
+                      type="number"
+                      placeholder="Aantal mannen"
+                      name="afbouw_men_needed"
+                      value={formData.afbouw_men_needed}
+                      onChange={handleChange}
+                      style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+                    />
+                  </div>
+                </div>
+
+                <h4 style={{ marginTop: '1.5rem', marginBottom: '1rem', color: '#555' }}>Transport Afbouw</h4>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
+                  <div>
+                    <label htmlFor="afbouw_transport_type"><b>Type</b></label>
+                    <input
+                      type="text"
+                      placeholder="Transport type"
+                      name="afbouw_transport_type"
+                      value={formData.afbouw_transport_type}
+                      onChange={handleChange}
+                      style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="afbouw_transport_amount"><b>Aantal</b></label>
+                    <input
+                      type="number"
+                      placeholder="Aantal"
+                      name="afbouw_transport_amount"
+                      value={formData.afbouw_transport_amount}
+                      onChange={handleChange}
+                      style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+                    />
+                  </div>
+                </div>
+
+                <h4 style={{ marginTop: '1.5rem', marginBottom: '1rem', color: '#555' }}>Hoogwerkers Afbouw</h4>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                  <div>
+                    <label htmlFor="afbouw_hoogwerkers_type"><b>Type</b></label>
+                    <input
+                      type="text"
+                      placeholder="Hoogwerkers type"
+                      name="afbouw_hoogwerkers_type"
+                      value={formData.afbouw_hoogwerkers_type}
+                      onChange={handleChange}
+                      style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="afbouw_hoogwerkers_amount"><b>Aantal</b></label>
+                    <input
+                      type="number"
+                      placeholder="Aantal"
+                      name="afbouw_hoogwerkers_amount"
+                      value={formData.afbouw_hoogwerkers_amount}
+                      onChange={handleChange}
+                      style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+                    />
                   </div>
                 </div>
               </div>
 
               {/* Links en Opslag */}
-              <h3 style={{ marginBottom: '1rem', color: '#333' }}>Links en Opslag</h3>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem', marginBottom: '1rem' }}>
-                <div>
-                  <label htmlFor="magazijnbon_link"><b>Magazijnbon Link</b></label>
-                  <input
-                    type="url"
-                    placeholder="Link naar magazijnbon"
-                    name="magazijnbon_link"
-                    value={formData.magazijnbon_link}
-                    onChange={handleChange}
-                    style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
-                  />
-                </div>
-                <div>
-                  <label htmlFor="project_map_opbouw_link"><b>Project Map Opbouw Link</b></label>
-                  <input
-                    type="url"
-                    placeholder="Link naar project map opbouw"
-                    name="project_map_opbouw_link"
-                    value={formData.project_map_opbouw_link}
-                    onChange={handleChange}
-                    style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
-                  />
-                </div>
-                <div>
-                  <label htmlFor="project_map_afbouw_link"><b>Project Map Afbouw Link</b></label>
-                  <input
-                    type="url"
-                    placeholder="Link naar project map afbouw"
-                    name="project_map_afbouw_link"
-                    value={formData.project_map_afbouw_link}
-                    onChange={handleChange}
-                    style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
-                  />
-                </div>
-                <div>
-                  <label htmlFor="storageplace_adres"><b>Opslagplaats Adres</b></label>
-                  <input
-                    type="text"
-                    placeholder="Adres van opslagplaats"
-                    name="storageplace_adres"
-                    value={formData.storageplace_adres}
-                    onChange={handleChange}
-                    style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
-                  />
+              <div style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: '8px', marginBottom: '1.5rem', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' }}>
+                <h3 style={{ marginTop: 0, marginBottom: '1rem', color: '#333' }}>Links en Opslag</h3>
+                <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                  <div>
+                    <label htmlFor="magazijnbon_link"><b>Magazijnbon Link</b></label>
+                    <input
+                      type="url"
+                      placeholder="Link naar magazijnbon"
+                      name="magazijnbon_link"
+                      value={formData.magazijnbon_link}
+                      onChange={handleChange}
+                      style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="project_map_opbouw_link"><b>Project Map Opbouw Link</b></label>
+                    <input
+                      type="url"
+                      placeholder="Link naar project map opbouw"
+                      name="project_map_opbouw_link"
+                      value={formData.project_map_opbouw_link}
+                      onChange={handleChange}
+                      style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="project_map_afbouw_link"><b>Project Map Afbouw Link</b></label>
+                    <input
+                      type="url"
+                      placeholder="Link naar project map afbouw"
+                      name="project_map_afbouw_link"
+                      value={formData.project_map_afbouw_link}
+                      onChange={handleChange}
+                      style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+                    />
+                  </div>
+                  <div>
+                    <label htmlFor="storageplace_adres"><b>Opslagplaats Adres</b></label>
+                    <input
+                      type="text"
+                      placeholder="Adres van opslagplaats"
+                      name="storageplace_adres"
+                      value={formData.storageplace_adres}
+                      onChange={handleChange}
+                      style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+                    />
+                  </div>
                 </div>
               </div>
 
               {/* Beschrijving */}
-              <h3 style={{ marginBottom: '1rem', color: '#333' }}>Beschrijving</h3>
-              <div style={{ marginBottom: '1rem' }}>
-                <label htmlFor="description"><b>Beschrijving *</b></label>
-                <textarea
-                  placeholder="Beschrijving van de opdracht"
-                  name="description"
-                  value={formData.description}
-                  onChange={handleChange}
-                  required
-                  style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px', minHeight: '100px' }}
-                />
+              <div style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: '8px', marginBottom: '1.5rem', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' }}>
+                <h3 style={{ marginTop: 0, marginBottom: '1rem', color: '#333' }}>Beschrijving</h3>
+                <div>
+                  <label htmlFor="description"><b>Beschrijving *</b></label>
+                  <textarea
+                    placeholder="Beschrijving van de opdracht"
+                    name="description"
+                    value={formData.description}
+                    onChange={handleChange}
+                    required
+                    style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px', minHeight: '100px' }}
+                  />
+                </div>
               </div>
 
               {/* Afbeeldingen */}
-              <h3 style={{ marginBottom: '1rem', color: '#333' }}>Afbeeldingen</h3>
-              <div style={{ marginBottom: '1rem' }}>
-                <label htmlFor="images"><b>Afbeeldingen Uploaden (Meerdere mogelijk)</b></label>
-                <input
-                  type="file"
-                  accept="image/*"
-                  multiple
-                  onChange={handleImageChange}
-                  style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
-                />
-                {imagePreviews.length > 0 && (
-                  <div style={{ marginTop: '1rem', display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
-                    {imagePreviews.map((preview, index) => (
-                      <div key={index} style={{ textAlign: 'center' }}>
-                        <img src={preview} alt={`Preview ${index + 1}`} style={{ maxWidth: '200px', maxHeight: '200px', border: '1px solid #ccc' }} />
-                        <button
-                          type="button"
-                          onClick={() => removeImage(index)}
-                          className="button theme-l1"
-                          style={{ marginTop: '0.5rem', padding: '0.5rem 1rem' }}
-                        >
-                          Verwijder
-                        </button>
-                      </div>
-                    ))}
-                  </div>
-                )}
-              </div>
-
-              {/* PDF's */}
-              <h3 style={{ marginBottom: '1rem', color: '#333' }}>PDF's</h3>
-              <div style={{ marginBottom: '1rem' }}>
-                <label htmlFor="pdfs"><b>PDF's Uploaden (Meerdere mogelijk)</b></label>
-                <input
-                  type="file"
-                  name="pdfs"
-                  accept="application/pdf"
-                  multiple
-                  onChange={handlePdfChange}
-                  style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
-                />
-                {pdfFiles.length > 0 && (
-                  <div style={{ marginTop: '1rem' }}>
-                    <ul>
-                      {pdfFiles.map((file, index) => (
-                        <li key={index} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
-                          <span>{file.name}</span>
+              <div style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: '8px', marginBottom: '1.5rem', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' }}>
+                <h3 style={{ marginTop: 0, marginBottom: '1rem', color: '#333' }}>Afbeeldingen</h3>
+                <div>
+                  <label htmlFor="images"><b>Afbeeldingen Uploaden (Meerdere mogelijk)</b></label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleImageChange}
+                    style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+                  />
+                  {imagePreviews.length > 0 && (
+                    <div style={{ marginTop: '1rem', display: 'flex', flexWrap: 'wrap', gap: '1rem' }}>
+                      {imagePreviews.map((preview, index) => (
+                        <div key={index} style={{ textAlign: 'center' }}>
+                          <img src={preview} alt={`Preview ${index + 1}`} style={{ maxWidth: '200px', maxHeight: '200px', border: '1px solid #ccc' }} />
                           <button
                             type="button"
-                            onClick={() => removePdf(index)}
+                            onClick={() => removeImage(index)}
                             className="button theme-l1"
-                            style={{ padding: '0.25rem 0.5rem' }}
+                            style={{ marginTop: '0.5rem', padding: '0.5rem 1rem' }}
                           >
                             Verwijder
                           </button>
-                        </li>
+                        </div>
                       ))}
-                    </ul>
-                  </div>
-                )}
+                    </div>
+                  )}
+                </div>
+              </div>
+
+              {/* PDF's */}
+              <div style={{ backgroundColor: 'white', padding: '1.5rem', borderRadius: '8px', marginBottom: '1.5rem', boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)' }}>
+                <h3 style={{ marginTop: 0, marginBottom: '1rem', color: '#333' }}>PDF's</h3>
+                <div>
+                  <label htmlFor="pdfs"><b>PDF's Uploaden (Meerdere mogelijk)</b></label>
+                  <input
+                    type="file"
+                    name="pdfs"
+                    accept="application/pdf"
+                    multiple
+                    onChange={handlePdfChange}
+                    style={{ width: '100%', padding: '0.5rem', border: '1px solid #ccc', borderRadius: '4px' }}
+                  />
+                  {pdfFiles.length > 0 && (
+                    <div style={{ marginTop: '1rem' }}>
+                      <ul>
+                        {pdfFiles.map((file, index) => (
+                          <li key={index} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '0.5rem' }}>
+                            <span>{file.name}</span>
+                            <button
+                              type="button"
+                              onClick={() => removePdf(index)}
+                              className="button theme-l1"
+                              style={{ padding: '0.25rem 0.5rem' }}
+                            >
+                              Verwijder
+                            </button>
+                          </li>
+                        ))}
+                      </ul>
+                    </div>
+                  )}
+                </div>
               </div>
 
               {/* Message */}
@@ -673,8 +675,7 @@ useEffect(() => {
                   {loading ? 'Bezig met plaatsen...' : 'Opdracht Plaatsen'}
                 </button>
               </div>
-            </form>
-          </div>
+          </form>
         </div>
       </div>
 

@@ -447,8 +447,8 @@ export default function OpdrachtenPage() {
             style={{
               backgroundColor: 'white',
               borderRadius: '8px',
-              maxWidth: '600px',
-              width: '90%',
+              maxWidth: '1000px',
+              width: '95%',
               padding: '2rem',
               position: 'relative',
               maxHeight: '90vh',
@@ -472,88 +472,227 @@ export default function OpdrachtenPage() {
               Sluiten
             </button>
 
-            <h2>{selectedOpdracht.title}</h2>
+            <h2 style={{ marginBottom: '1.5rem' }}>{selectedOpdracht.title}</h2>
 
-            <div style={{ marginBottom: '1rem' }}>
-              <h4 style={{ marginBottom: '0.5rem', color: '#333' }}>Basis Informatie</h4>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
-                <p><strong>Beschrijving:</strong> {selectedOpdracht.description}</p>
-                <p><strong>Categorie:</strong> {selectedOpdracht.category || 'Geen'}</p>
-                <p><strong>Deadline:</strong> {new Date(selectedOpdracht.deadline).toLocaleDateString()}</p>
-                <p><strong>Status:</strong> {selectedOpdracht.status}</p>
-                <p><strong>Aangemaakt:</strong> {new Date(selectedOpdracht.created_at).toLocaleDateString()}</p>
+            <div style={{ 
+              backgroundColor: 'white', 
+              padding: '1.5rem', 
+              borderRadius: '8px', 
+              marginBottom: '1.5rem',
+              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+            }}>
+              <h4 style={{ marginTop: 0, marginBottom: '1rem', color: '#333' }}>
+                Basis Informatie
+              </h4>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                <div>
+                  <p style={{ margin: '0.25rem 0', color: '#666' }}><strong>Beschrijving:</strong></p>
+                  <p style={{ margin: '0', color: '#333' }}>{selectedOpdracht.description}</p>
+                </div>
+                <div>
+                  <p style={{ margin: '0.25rem 0', color: '#666' }}><strong>Categorie:</strong></p>
+                  <p style={{ margin: '0', color: '#333' }}>{selectedOpdracht.category || 'Geen'}</p>
+                </div>
+                <div>
+                  <p style={{ margin: '0.25rem 0', color: '#666' }}><strong>Deadline:</strong></p>
+                  <p style={{ margin: '0', color: '#333' }}>{new Date(selectedOpdracht.deadline).toLocaleDateString()}</p>
+                </div>
+                <div>
+                  <p style={{ margin: '0.25rem 0', color: '#666' }}><strong>Status:</strong></p>
+                  <p style={{ margin: '0', color: '#333' }}>{selectedOpdracht.status}</p>
+                </div>
+                <div>
+                  <p style={{ margin: '0.25rem 0', color: '#666' }}><strong>Aangemaakt:</strong></p>
+                  <p style={{ margin: '0', color: '#333' }}>{new Date(selectedOpdracht.created_at).toLocaleDateString()}</p>
+                </div>
               </div>
             </div>
 
-            <div style={{ marginBottom: '1rem' }}>
-              <h4 style={{ marginBottom: '0.5rem', color: '#333' }}>Locatie</h4>
-              <p><strong>Locatie:</strong> {selectedOpdracht.location_city ? `${selectedOpdracht.location_city}, ${selectedOpdracht.location_address}, ${selectedOpdracht.location_postcode}` : 'Geen'}</p>
+            <div style={{ 
+              backgroundColor: 'white', 
+              padding: '1.5rem', 
+              borderRadius: '8px', 
+              marginBottom: '1.5rem',
+              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+            }}>
+              <h4 style={{ marginTop: 0, marginBottom: '1rem', color: '#333' }}>
+                Locatie
+              </h4>
+              <p style={{ margin: '0', color: '#333' }}>{selectedOpdracht.location_city ? `${selectedOpdracht.location_city}, ${selectedOpdracht.location_address}, ${selectedOpdracht.location_postcode}` : 'Geen'}</p>
             </div>
 
-            <div style={{ marginBottom: '1rem' }}>
-              <h4 style={{ marginBottom: '0.5rem', color: '#333' }}>Opbouw Tijd</h4>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
-                <p><strong>Datum:</strong> {selectedOpdracht.opbouw_date ? new Date(selectedOpdracht.opbouw_date).toLocaleDateString() : 'Niet opgegeven'}</p>
-                <p><strong>Tijd:</strong> {selectedOpdracht.opbouw_time || 'Niet opgegeven'}</p>
+            <div style={{ 
+              backgroundColor: 'white', 
+              padding: '1.5rem', 
+              borderRadius: '8px', 
+              marginBottom: '1.5rem',
+              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+            }}>
+              <h4 style={{ marginTop: 0, marginBottom: '1rem', color: '#333' }}>
+                Opbouw
+              </h4>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
+                <div>
+                  <p style={{ margin: '0.25rem 0', color: '#666' }}><strong>Datum:</strong></p>
+                  <p style={{ margin: '0', color: '#333' }}>{selectedOpdracht.opbouw_date ? new Date(selectedOpdracht.opbouw_date).toLocaleDateString() : 'Niet opgegeven'}</p>
+                </div>
+                <div>
+                  <p style={{ margin: '0.25rem 0', color: '#666' }}><strong>Tijd:</strong></p>
+                  <p style={{ margin: '0', color: '#333' }}>{selectedOpdracht.opbouw_time || 'Niet opgegeven'}</p>
+                </div>
+                <div>
+                  <p style={{ margin: '0.25rem 0', color: '#666' }}><strong>Hard Opbouw:</strong></p>
+                  <p style={{ margin: '0', color: '#333' }}>{selectedOpdracht.hard_opbouw || 'Niet opgegeven'}</p>
+                </div>
+                <div>
+                  <p style={{ margin: '0.25rem 0', color: '#666' }}><strong>Dagen Aantal:</strong></p>
+                  <p style={{ margin: '0', color: '#333' }}>{selectedOpdracht.opbouw_dagen_amount || 'Niet opgegeven'}</p>
+                </div>
+                <div>
+                  <p style={{ margin: '0.25rem 0', color: '#666' }}><strong>Mannen Nodig:</strong></p>
+                  <p style={{ margin: '0', color: '#333' }}>{selectedOpdracht.opbouw_men_needed || 'Niet opgegeven'}</p>
+                </div>
               </div>
             </div>
 
-            <div style={{ marginBottom: '1rem' }}>
-              <h4 style={{ marginBottom: '0.5rem', color: '#333' }}>Opbouw Details</h4>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
-                <p><strong>Hard Opbouw:</strong> {selectedOpdracht.hard_opbouw || 'Niet opgegeven'}</p>
-                <p><strong>Dagen Aantal:</strong> {selectedOpdracht.opbouw_dagen_amount || 'Niet opgegeven'}</p>
-                <p><strong>Mannen Nodig:</strong> {selectedOpdracht.opbouw_men_needed || 'Niet opgegeven'}</p>
+            <div style={{ 
+              backgroundColor: 'white', 
+              padding: '1.5rem', 
+              borderRadius: '8px', 
+              marginBottom: '1.5rem',
+              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+            }}>
+              <h4 style={{ marginTop: 0, marginBottom: '1rem', color: '#333' }}>
+                Afbouw
+              </h4>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr', gap: '1rem' }}>
+                <div>
+                  <p style={{ margin: '0.25rem 0', color: '#666' }}><strong>Datum:</strong></p>
+                  <p style={{ margin: '0', color: '#333' }}>{selectedOpdracht.planning_afbouw_date ? new Date(selectedOpdracht.planning_afbouw_date).toLocaleDateString() : 'Niet opgegeven'}</p>
+                </div>
+                <div>
+                  <p style={{ margin: '0.25rem 0', color: '#666' }}><strong>Tijd:</strong></p>
+                  <p style={{ margin: '0', color: '#333' }}>{selectedOpdracht.planning_afbouw_time || 'Niet opgegeven'}</p>
+                </div>
+                <div>
+                  <p style={{ margin: '0.25rem 0', color: '#666' }}><strong>Hard Afbouw:</strong></p>
+                  <p style={{ margin: '0', color: '#333' }}>{selectedOpdracht.hard_afbouw || 'Niet opgegeven'}</p>
+                </div>
+                <div>
+                  <p style={{ margin: '0.25rem 0', color: '#666' }}><strong>Dagen Aantal:</strong></p>
+                  <p style={{ margin: '0', color: '#333' }}>{selectedOpdracht.afbouw_dagen_amount || 'Niet opgegeven'}</p>
+                </div>
+                <div>
+                  <p style={{ margin: '0.25rem 0', color: '#666' }}><strong>Mannen Nodig:</strong></p>
+                  <p style={{ margin: '0', color: '#333' }}>{selectedOpdracht.afbouw_men_needed || 'Niet opgegeven'}</p>
+                </div>
               </div>
             </div>
 
-            <div style={{ marginBottom: '1rem' }}>
-              <h4 style={{ marginBottom: '0.5rem', color: '#333' }}>Afbouw Details</h4>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
-                <p><strong>Datum:</strong> {selectedOpdracht.planning_afbouw_date ? new Date(selectedOpdracht.planning_afbouw_date).toLocaleDateString() : 'Niet opgegeven'}</p>
-                <p><strong>Tijd:</strong> {selectedOpdracht.planning_afbouw_time || 'Niet opgegeven'}</p>
-                <p><strong>Hard Afbouw:</strong> {selectedOpdracht.hard_afbouw || 'Niet opgegeven'}</p>
-                <p><strong>Dagen Aantal:</strong> {selectedOpdracht.afbouw_dagen_amount || 'Niet opgegeven'}</p>
-                <p><strong>Mannen Nodig:</strong> {selectedOpdracht.afbouw_men_needed || 'Niet opgegeven'}</p>
+            <div style={{ 
+              backgroundColor: 'white', 
+              padding: '1.5rem', 
+              borderRadius: '8px', 
+              marginBottom: '1.5rem',
+              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+            }}>
+              <h4 style={{ marginTop: 0, marginBottom: '1rem', color: '#333' }}>
+                Transport
+              </h4>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '1rem' }}>
+                <div>
+                  <p style={{ margin: '0.25rem 0', color: '#666' }}><strong>Opbouw Type:</strong></p>
+                  <p style={{ margin: '0', color: '#333' }}>{selectedOpdracht.opbouw_transport_type || 'Niet opgegeven'}</p>
+                </div>
+                <div>
+                  <p style={{ margin: '0.25rem 0', color: '#666' }}><strong>Opbouw Aantal:</strong></p>
+                  <p style={{ margin: '0', color: '#333' }}>{selectedOpdracht.opbouw_transport_amount || 'Niet opgegeven'}</p>
+                </div>
+                <div>
+                  <p style={{ margin: '0.25rem 0', color: '#666' }}><strong>Afbouw Type:</strong></p>
+                  <p style={{ margin: '0', color: '#333' }}>{selectedOpdracht.afbouw_transport_type || 'Niet opgegeven'}</p>
+                </div>
+                <div>
+                  <p style={{ margin: '0.25rem 0', color: '#666' }}><strong>Afbouw Aantal:</strong></p>
+                  <p style={{ margin: '0', color: '#333' }}>{selectedOpdracht.afbouw_transport_amount || 'Niet opgegeven'}</p>
+                </div>
               </div>
             </div>
 
-            <div style={{ marginBottom: '1rem' }}>
-              <h4 style={{ marginBottom: '0.5rem', color: '#333' }}>Transport</h4>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
-                <p><strong>Opbouw Type:</strong> {selectedOpdracht.opbouw_transport_type || 'Niet opgegeven'}</p>
-                <p><strong>Opbouw Aantal:</strong> {selectedOpdracht.opbouw_transport_amount || 'Niet opgegeven'}</p>
-                <p><strong>Afbouw Type:</strong> {selectedOpdracht.afbouw_transport_type || 'Niet opgegeven'}</p>
-                <p><strong>Afbouw Aantal:</strong> {selectedOpdracht.afbouw_transport_amount || 'Niet opgegeven'}</p>
+            <div style={{ 
+              backgroundColor: 'white', 
+              padding: '1.5rem', 
+              borderRadius: '8px', 
+              marginBottom: '1.5rem',
+              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+            }}>
+              <h4 style={{ marginTop: 0, marginBottom: '1rem', color: '#333' }}>
+                Hoogwerkers
+              </h4>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr 1fr 1fr', gap: '1rem' }}>
+                <div>
+                  <p style={{ margin: '0.25rem 0', color: '#666' }}><strong>Opbouw Type:</strong></p>
+                  <p style={{ margin: '0', color: '#333' }}>{selectedOpdracht.opbouw_hoogwerkers_type || 'Niet opgegeven'}</p>
+                </div>
+                <div>
+                  <p style={{ margin: '0.25rem 0', color: '#666' }}><strong>Opbouw Aantal:</strong></p>
+                  <p style={{ margin: '0', color: '#333' }}>{selectedOpdracht.opbouw_hoogwerkers_amount || 'Niet opgegeven'}</p>
+                </div>
+                <div>
+                  <p style={{ margin: '0.25rem 0', color: '#666' }}><strong>Afbouw Type:</strong></p>
+                  <p style={{ margin: '0', color: '#333' }}>{selectedOpdracht.afbouw_hoogwerkers_type || 'Niet opgegeven'}</p>
+                </div>
+                <div>
+                  <p style={{ margin: '0.25rem 0', color: '#666' }}><strong>Afbouw Aantal:</strong></p>
+                  <p style={{ margin: '0', color: '#333' }}>{selectedOpdracht.afbouw_hoogwerkers_amount || 'Niet opgegeven'}</p>
+                </div>
               </div>
             </div>
 
-            <div style={{ marginBottom: '1rem' }}>
-              <h4 style={{ marginBottom: '0.5rem', color: '#333' }}>Hoogwerkers</h4>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
-                <p><strong>Opbouw Type:</strong> {selectedOpdracht.opbouw_hoogwerkers_type || 'Niet opgegeven'}</p>
-                <p><strong>Opbouw Aantal:</strong> {selectedOpdracht.opbouw_hoogwerkers_amount || 'Niet opgegeven'}</p>
-                <p><strong>Afbouw Type:</strong> {selectedOpdracht.afbouw_hoogwerkers_type || 'Niet opgegeven'}</p>
-                <p><strong>Afbouw Aantal:</strong> {selectedOpdracht.afbouw_hoogwerkers_amount || 'Niet opgegeven'}</p>
-              </div>
-            </div>
-
-            <div style={{ marginBottom: '1rem' }}>
-              <h4 style={{ marginBottom: '0.5rem', color: '#333' }}>Links en Opslag</h4>
-              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0.5rem' }}>
-                <p><strong>Magazijnbon Link:</strong> {selectedOpdracht.magazijnbon_link ? <a href={selectedOpdracht.magazijnbon_link} target="_blank" rel="noopener noreferrer">Bekijk</a> : 'Niet opgegeven'}</p>
-                <p><strong>Project Map Opbouw Link:</strong> {selectedOpdracht.project_map_opbouw_link ? <a href={selectedOpdracht.project_map_opbouw_link} target="_blank" rel="noopener noreferrer">Bekijk</a> : 'Niet opgegeven'}</p>
-                <p><strong>Project Map Afbouw Link:</strong> {selectedOpdracht.project_map_afbouw_link ? <a href={selectedOpdracht.project_map_afbouw_link} target="_blank" rel="noopener noreferrer">Bekijk</a> : 'Niet opgegeven'}</p>
-                <p><strong>Storageplace Adres:</strong> {selectedOpdracht.storageplace_adres || 'Niet opgegeven'}</p>
+            <div style={{ 
+              backgroundColor: 'white', 
+              padding: '1.5rem', 
+              borderRadius: '8px', 
+              marginBottom: '1.5rem',
+              boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+            }}>
+              <h4 style={{ marginTop: 0, marginBottom: '1rem', color: '#333' }}>
+                Links en Opslag
+              </h4>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '1rem' }}>
+                <div>
+                  <p style={{ margin: '0.25rem 0', color: '#666' }}><strong>Magazijnbon Link:</strong></p>
+                  <p style={{ margin: '0', color: '#333' }}>{selectedOpdracht.magazijnbon_link ? <a href={selectedOpdracht.magazijnbon_link} target="_blank" rel="noopener noreferrer">Bekijk</a> : 'Niet opgegeven'}</p>
+                </div>
+                <div>
+                  <p style={{ margin: '0.25rem 0', color: '#666' }}><strong>Project Map Opbouw Link:</strong></p>
+                  <p style={{ margin: '0', color: '#333' }}>{selectedOpdracht.project_map_opbouw_link ? <a href={selectedOpdracht.project_map_opbouw_link} target="_blank" rel="noopener noreferrer">Bekijk</a> : 'Niet opgegeven'}</p>
+                </div>
+                <div>
+                  <p style={{ margin: '0.25rem 0', color: '#666' }}><strong>Project Map Afbouw Link:</strong></p>
+                  <p style={{ margin: '0', color: '#333' }}>{selectedOpdracht.project_map_afbouw_link ? <a href={selectedOpdracht.project_map_afbouw_link} target="_blank" rel="noopener noreferrer">Bekijk</a> : 'Niet opgegeven'}</p>
+                </div>
+                <div>
+                  <p style={{ margin: '0.25rem 0', color: '#666' }}><strong>Storageplace Adres:</strong></p>
+                  <p style={{ margin: '0', color: '#333' }}>{selectedOpdracht.storageplace_adres || 'Niet opgegeven'}</p>
+                </div>
               </div>
             </div>
 
             {((selectedOpdracht.images && selectedOpdracht.images.length > 0) || (selectedOpdracht.pdfs && selectedOpdracht.pdfs.length > 0)) && (
-              <div style={{ marginBottom: '1rem' }}>
-                <h4 style={{ marginBottom: '0.5rem', color: '#333' }}>Bijlagen</h4>
+              <div style={{ 
+                backgroundColor: 'white', 
+                padding: '1.5rem', 
+                borderRadius: '8px', 
+                marginBottom: '1.5rem',
+                boxShadow: '0 2px 4px rgba(0, 0, 0, 0.1)'
+              }}>
+                <h4 style={{ marginTop: 0, marginBottom: '1rem', color: '#333' }}>
+                  Bijlagen
+                </h4>
                 {selectedOpdracht.images && selectedOpdracht.images.length > 0 && (
                   <div style={{ marginBottom: '1rem' }}>
-                    <h5>Afbeeldingen:</h5>
+                    <h5 style={{ marginTop: 0, marginBottom: '0.5rem' }}>Afbeeldingen:</h5>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
                       {selectedOpdracht.images.map((image, index) => (
                         <img
@@ -568,7 +707,7 @@ export default function OpdrachtenPage() {
                 )}
                 {selectedOpdracht.pdfs && selectedOpdracht.pdfs.length > 0 && (
                   <div>
-                    <h5>PDFs:</h5>
+                    <h5 style={{ marginTop: 0, marginBottom: '0.5rem' }}>PDFs:</h5>
                     <div style={{ display: 'flex', flexWrap: 'wrap', gap: '0.5rem' }}>
                       {selectedOpdracht.pdfs.map((pdf, index) => (
                         <a
