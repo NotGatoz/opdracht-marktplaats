@@ -36,6 +36,9 @@ export default async function handler(req, res) {
     project_map_opbouw_link,
     project_map_afbouw_link,
     storageplace_adres,
+    images,
+    pdfs,
+    pdf_filenames,
   } = req.body;
 
   // Validate required fields
@@ -82,8 +85,11 @@ export default async function handler(req, res) {
         project_map_opbouw_link = $27,
         project_map_afbouw_link = $28,
         storageplace_adres = $29,
+        images = $30,
+        pdfs = $31,
+        pdf_filenames = $32,
         updated_at = NOW()
-      WHERE id = $30
+      WHERE id = $33
       RETURNING *
     `;
 
@@ -117,6 +123,9 @@ export default async function handler(req, res) {
       project_map_opbouw_link || null,
       project_map_afbouw_link || null,
       storageplace_adres || null,
+      images || [],
+      pdfs || [],
+      pdf_filenames || [],
       id,
     ]);
 

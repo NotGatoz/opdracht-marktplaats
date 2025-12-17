@@ -17,6 +17,10 @@ export default function MijnOpdrachtenPage() {
   const [editFormData, setEditFormData] = useState({});
   const [editLoading, setEditLoading] = useState(false);
   const [completeLoading, setCompleteLoading] = useState(false);
+  const [uploadedImages, setUploadedImages] = useState([]);
+  const [uploadedPdfs, setUploadedPdfs] = useState([]);
+  const [imagePreviews, setImagePreviews] = useState([]);
+  const [pdfNames, setPdfNames] = useState([]);
 
   useEffect(() => {
     const fetchUser = () => {
@@ -191,6 +195,63 @@ export default function MijnOpdrachtenPage() {
       project_map_afbouw_link: opdracht.project_map_afbouw_link || '',
       storageplace_adres: opdracht.storageplace_adres || '',
     });
+    setUploadedImages(opdracht.images || []);
+    setUploadedPdfs(opdracht.pdfs || []);
+    setPdfNames(opdracht.pdf_filenames || []);
+    setImagePreviews(opdracht.images || []);
+  };
+
+  const fileToBase64 = (file) => {
+    return new Promise((resolve, reject) => {
+      const reader = new FileReader();
+      reader.onload = () => resolve(reader.result);
+      reader.onerror = reject;
+      reader.readAsDataURL(file);
+    });
+  };
+
+  const ensureDataUri = (base64Str) => {
+    if (!base64Str) return base64Str;
+    if (base64Str.startsWith('data:')) return base64Str;
+    return `data:image/jpeg;base64,${base64Str}`;
+  };
+
+  const handleAddImages = async (e) => {
+    const files = Array.from(e.target.files);
+    for (const file of files) {
+      try {
+        const base64 = await fileToBase64(file);
+        setUploadedImages(prev => [...prev, base64]);
+        setImagePreviews(prev => [...prev, base64]);
+      } catch (err) {
+        alert('Fout bij uploaden afbeelding: ' + err.message);
+      }
+    }
+    e.target.value = '';
+  };
+
+  const handleAddPdfs = async (e) => {
+    const files = Array.from(e.target.files);
+    for (const file of files) {
+      try {
+        const base64 = await fileToBase64(file);
+        setUploadedPdfs(prev => [...prev, base64]);
+        setPdfNames(prev => [...prev, file.name]);
+      } catch (err) {
+        alert('Fout bij uploaden PDF: ' + err.message);
+      }
+    }
+    e.target.value = '';
+  };
+
+  const handleRemoveImage = (index) => {
+    setUploadedImages(prev => prev.filter((_, i) => i !== index));
+    setImagePreviews(prev => prev.filter((_, i) => i !== index));
+  };
+
+  const handleRemovePdf = (index) => {
+    setUploadedPdfs(prev => prev.filter((_, i) => i !== index));
+    setPdfNames(prev => prev.filter((_, i) => i !== index));
   };
 
   const handleEditChange = (e) => {
@@ -210,20 +271,21 @@ export default function MijnOpdrachtenPage() {
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           id: editModal.id,
-          ...editFormData
+          ...editFormData,
+          images: uploadedImages,
+          pdfs: uploadedPdfs,
+          pdf_filenames: pdfNames
         }),
       });
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Fout bij bijwerken opdracht');
       
-      // Refresh opdrachten list
       const fetchOpdrachten = async () => {
         try {
           const res = await fetch(`/api/opdracht/mijn-opdrachten?userId=${user.id}`);
           const data = await res.json();
           if (!res.ok) throw new Error(data.error || 'Fout bij ophalen mijn opdrachten');
           setOpdrachten(data.opdrachten);
-          // Update selectedOpdracht if it's still selected
           const updatedOpdracht = data.opdrachten.find(op => op.id === editModal.id);
           if (updatedOpdracht) {
             setSelectedOpdracht(updatedOpdracht);
@@ -234,6 +296,10 @@ export default function MijnOpdrachtenPage() {
       };
       fetchOpdrachten();
       setEditModal(null);
+      setUploadedImages([]);
+      setUploadedPdfs([]);
+      setImagePreviews([]);
+      setPdfNames([]);
       alert('Opdracht succesvol bijgewerkt!');
     } catch (err) {
       alert(err.message);
@@ -1001,6 +1067,116 @@ export default function MijnOpdrachtenPage() {
               </div>
             </div>
 
+            <div style={{ marginBottom: '1rem' }}>
+              <h4 style={{ marginBottom: '0.5rem', color: '#333' }}>Afbeeldingen en PDF's</h4>
+              <div style={{ display: 'grid', gridTemplateColumns: '1fr', gap: '0.5rem' }}>
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 'bold', fontSize: '0.9rem' }}>Afbeeldingen toevoegen</label>
+                  <input
+                    type="file"
+                    accept="image/*"
+                    multiple
+                    onChange={handleAddImages}
+                    style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ddd', boxSizing: 'border-box' }}
+                  />
+                </div>
+                {imagePreviews.length > 0 && (
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 'bold', fontSize: '0.9rem' }}>Geüploade Afbeeldingen</label>
+                    <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(100px, 1fr))', gap: '0.5rem' }}>
+                      {imagePreviews.map((image, index) => (
+                        <div key={index} style={{ position: 'relative', borderRadius: '4px', overflow: 'hidden', border: '1px solid #ddd' }}>
+                          <img
+                            src={ensureDataUri(image)}
+                            alt={`Preview ${index}`}
+                            style={{ width: '100%', height: '100px', objectFit: 'cover' }}
+                            onError={(e) => {
+                              e.target.style.backgroundColor = '#f0f0f0';
+                              e.target.style.display = 'flex';
+                              e.target.style.alignItems = 'center';
+                              e.target.style.justifyContent = 'center';
+                            }}
+                          />
+                          <button
+                            type="button"
+                            onClick={() => handleRemoveImage(index)}
+                            style={{
+                              position: 'absolute',
+                              top: '2px',
+                              right: '2px',
+                              backgroundColor: 'rgba(255, 0, 0, 0.8)',
+                              color: 'white',
+                              border: 'none',
+                              borderRadius: '50%',
+                              width: '20px',
+                              height: '20px',
+                              padding: '0',
+                              cursor: 'pointer',
+                              fontSize: '12px',
+                              fontWeight: 'bold'
+                            }}
+                          >
+                            ×
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+                <div>
+                  <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 'bold', fontSize: '0.9rem' }}>PDF's toevoegen</label>
+                  <input
+                    type="file"
+                    accept=".pdf"
+                    multiple
+                    onChange={handleAddPdfs}
+                    style={{ width: '100%', padding: '0.5rem', borderRadius: '4px', border: '1px solid #ddd', boxSizing: 'border-box' }}
+                  />
+                </div>
+                {uploadedPdfs.length > 0 && (
+                  <div>
+                    <label style={{ display: 'block', marginBottom: '0.25rem', fontWeight: 'bold', fontSize: '0.9rem' }}>Geüploade PDF's</label>
+                    <div style={{ display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                      {pdfNames.map((name, index) => (
+                        <div
+                          key={index}
+                          style={{
+                            display: 'flex',
+                            justifyContent: 'space-between',
+                            alignItems: 'center',
+                            padding: '0.5rem',
+                            backgroundColor: '#f0f0f0',
+                            borderRadius: '4px',
+                            border: '1px solid #ddd'
+                          }}
+                        >
+                          <span style={{ fontSize: '0.9rem', color: '#333', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', flex: 1 }}>
+                            <i className="fa fa-file-pdf-o"></i> {name}
+                          </span>
+                          <button
+                            type="button"
+                            onClick={() => handleRemovePdf(index)}
+                            style={{
+                              backgroundColor: '#dc3545',
+                              color: 'white',
+                              border: 'none',
+                              borderRadius: '4px',
+                              padding: '0.25rem 0.5rem',
+                              cursor: 'pointer',
+                              fontSize: '0.8rem',
+                              marginLeft: '0.5rem'
+                            }}
+                          >
+                            Verwijderen
+                          </button>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </div>
+            </div>
+
             <div style={{ display: 'flex', gap: '1rem', marginTop: '2rem' }}>
               <button
                 onClick={() => setEditModal(null)}
@@ -1018,7 +1194,7 @@ export default function MijnOpdrachtenPage() {
               </button>
               <button
                 onClick={handleSaveEdit}
-                disabled={editLoading || completeLoading}
+                disabled={editLoading}
                 style={{
                   flex: 1,
                   background: '#007bff',
@@ -1026,28 +1202,11 @@ export default function MijnOpdrachtenPage() {
                   border: 'none',
                   padding: '0.5rem 1rem',
                   borderRadius: '4px',
-                  cursor: editLoading || completeLoading ? 'not-allowed' : 'pointer',
+                  cursor: editLoading ? 'not-allowed' : 'pointer',
                 }}
               >
                 {editLoading ? 'Opslaan...' : 'Opslaan'}
               </button>
-              {editFormData.status !== 'voltooid' && (
-                <button
-                  onClick={handleCompleteOpdracht}
-                  disabled={completeLoading || editLoading}
-                  style={{
-                    flex: 1,
-                    background: '#28a745',
-                    color: 'white',
-                    border: 'none',
-                    padding: '0.5rem 1rem',
-                    borderRadius: '4px',
-                    cursor: completeLoading || editLoading ? 'not-allowed' : 'pointer',
-                  }}
-                >
-                  {completeLoading ? 'Voltooiing...' : 'Voltooien'}
-                </button>
-              )}
             </div>
           </div>
         </div>
