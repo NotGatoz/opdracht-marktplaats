@@ -342,21 +342,40 @@ export default function OpdrachtenPage() {
                   e.currentTarget.style.transform = 'translateY(0)';
                 }}
               >
-                {opdracht.total_bid_count > 0 && (
-                  <div style={{
-                    position: 'absolute',
-                    top: '12px',
-                    right: '12px',
-                    backgroundColor: '#ff6b6b',
-                    color: 'white',
-                    padding: '0.35rem 0.65rem',
-                    borderRadius: '20px',
-                    fontWeight: 600,
-                    fontSize: '0.8rem'
-                  }}>
-                    {opdracht.total_bid_count} {opdracht.total_bid_count === 1 ? 'bod' : 'boden'}
-                  </div>
-                )}
+                <div style={{
+                  position: 'absolute',
+                  top: '12px',
+                  right: '12px',
+                  display: 'flex',
+                  gap: '0.5rem',
+                  zIndex: 1
+                }}>
+                  {(new Date() - new Date(opdracht.created_at)) < 24 * 60 * 60 * 1000 && (
+                    <div style={{
+                      backgroundColor: '#28a745',
+                      color: 'white',
+                      padding: '0.35rem 0.65rem',
+                      borderRadius: '20px',
+                      fontWeight: 600,
+                      fontSize: '0.8rem',
+                    }}>
+                      Nieuw geplaatst
+                    </div>
+                  )}
+
+                  {opdracht.total_bid_count > 0 && (
+                    <div style={{
+                      backgroundColor: '#ff6b6b',
+                      color: 'white',
+                      padding: '0.35rem 0.65rem',
+                      borderRadius: '20px',
+                      fontWeight: 600,
+                      fontSize: '0.8rem'
+                    }}>
+                      {opdracht.total_bid_count} {opdracht.total_bid_count === 1 ? 'bod' : 'boden'}
+                    </div>
+                  )}
+                </div>
                 
                 <div style={{ marginBottom: '1rem' }}>
                   <h3 style={{ margin: '0 0 0.5rem 0', color: '#333', fontSize: '1.1rem', fontWeight: 600 }}>
