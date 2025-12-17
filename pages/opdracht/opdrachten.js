@@ -13,7 +13,8 @@ export default function OpdrachtenPage() {
   const [bidLoading, setBidLoading] = useState(false);
   const [hasBid, setHasBid] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
-  const [selectedFilter, setSelectedFilter] = useState('');
+  const [selectedBidFilter, setSelectedBidFilter] = useState('');
+  const [selectedSortFilter, setSelectedSortFilter] = useState('');
   const [showMessagePopup, setShowMessagePopup] = useState(false);
   const [messages, setMessages] = useState([]);
   const [newMessage, setNewMessage] = useState('');
@@ -182,6 +183,8 @@ export default function OpdrachtenPage() {
 
 
 
+
+
   const filteredOpdrachten = opdrachten
     .filter((opdracht) => {
       if (opdracht.status === 'aangenomen') return false;
@@ -191,87 +194,233 @@ export default function OpdrachtenPage() {
         opdracht.description.toLowerCase().includes(searchQuery.toLowerCase());
       if (!matchesSearch) return false;
 
-      switch (selectedFilter) {
-        case 'geboden':
-          return opdracht.total_bid_count > 0;
-        case 'nog niet geboden':
-          return opdracht.total_bid_count == 0; // Use loose equality to handle string "0"
-        case 'ik geboden':
-          return user && opdracht.user_bid_count > 0;
-        case 'nieuw':
-          return true; // Will be sorted later
-        case 'oud':
-          return true; // Will be sorted later
-        default:
-          return true;
-      }
+      if (!selectedBidFilter) return true;
+
+      if (selectedBidFilter === 'ik geboden') return user && Number(opdracht.user_bid_count) > 0;
+
+      return true;
     })
     .sort((a, b) => {
-      if (selectedFilter === 'nieuw') {
+      if (selectedSortFilter === 'nieuw') {
         return new Date(b.created_at) - new Date(a.created_at);
-      } else if (selectedFilter === 'oud') {
+      } else if (selectedSortFilter === 'oud') {
         return new Date(a.created_at) - new Date(b.created_at);
       }
-      return 0; // Default order
+      return 0;
     });
 
   return (
     <div className="theme-l5" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <Navbar />
 
-      <div style={{ flex: 1, padding: '2rem', marginTop: '80px' }}>
-        <h1>Opdrachten</h1>
-        {loading && <p>Laden...</p>}
-        {error && <p style={{ color: 'red' }}>{error}</p>}
+      <div style={{ flex: 1, display: 'flex', marginTop: '80px' }}>
+        <div style={{ width: '250px', backgroundColor: '#f8f9fa', borderRight: '1px solid #e0e0e0', padding: '2rem', minHeight: '100vh', overflowY: 'auto' }}>
+          <h3 style={{ marginBottom: '1.5rem', color: '#333', fontSize: '1.1rem', fontWeight: 600 }}>Zoeken & Filteren</h3>
+          
+          <div style={{ marginBottom: '2rem' }}>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500, color: '#555', fontSize: '0.9rem' }}>Zoeken</label>
+            <input
+              type="text"
+              placeholder="Zoek opdrachten..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{ 
+                padding: '0.7rem', 
+                width: '100%', 
+                borderRadius: '6px', 
+                border: '1px solid #ddd', 
+                fontSize: '0.9rem',
+                boxSizing: 'border-box'
+              }}
+            />
+          </div>
 
-        <div style={{ marginBottom: '1rem' }}>
-          <input
-            type="text"
-            placeholder="Zoek opdrachten..."
-            value={searchQuery}
-            onChange={(e) => setSearchQuery(e.target.value)}
-            style={{ padding: '0.5rem', width: '100%', marginBottom: '0.5rem', borderRadius: '4px', border: '1px solid #ccc' }}
-          />
-          <select
-            value={selectedFilter}
-            onChange={(e) => setSelectedFilter(e.target.value)}
-            style={{ padding: '0.5rem', width: '100%', borderRadius: '4px', border: '1px solid #ccc' }}
-          >
-            <option value="">Alle opdrachten</option>
-            <option value="geboden">Geboden</option>
-            <option value="nog niet geboden">Nog niet geboden</option>
-            <option value="ik geboden">Ik heb geboden</option>
-            <option value="nieuw">Nieuw</option>
-            <option value="oud">Oud</option>
-          </select>
+          <div>
+            <h4 style={{ marginBottom: '1rem', color: '#333', fontSize: '0.95rem', fontWeight: 600 }}>Filters</h4>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', gap: '0.5rem' }}>
+                <input
+                  type="radio"
+                  name="bid-filter"
+                  value=""
+                  checked={selectedBidFilter === ''}
+                  onChange={(e) => setSelectedBidFilter(e.target.value)}
+                  style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                />
+                <span style={{ color: '#555', fontSize: '0.9rem' }}>Alle</span>
+              </label>
+              {[
+                { id: 'ik geboden', label: 'Ik heb geboden' },
+              ].map((filter) => (
+                <label key={filter.id} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', gap: '0.5rem' }}>
+                  <input
+                    type="radio"
+                    name="bid-filter"
+                    value={filter.id}
+                    checked={selectedBidFilter === filter.id}
+                    onChange={(e) => setSelectedBidFilter(e.target.value)}
+                    style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                  />
+                  <span style={{ color: '#555', fontSize: '0.9rem' }}>{filter.label}</span>
+                </label>
+              ))}
+            </div>
+          </div>
+
+          <hr style={{ margin: '1.5rem 0', borderColor: '#e0e0e0' }} />
+
+          <div>
+            <h4 style={{ marginBottom: '1rem', color: '#333', fontSize: '0.95rem', fontWeight: 600 }}>Sorteren</h4>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+              <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', gap: '0.5rem' }}>
+                <input
+                  type="radio"
+                  name="sort-filter"
+                  value=""
+                  checked={selectedSortFilter === ''}
+                  onChange={(e) => setSelectedSortFilter(e.target.value)}
+                  style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                />
+                <span style={{ color: '#555', fontSize: '0.9rem' }}>Standaard</span>
+              </label>
+              {[
+                { id: 'nieuw', label: 'Nieuwste' },
+                { id: 'oud', label: 'Oudste' },
+              ].map((sort) => (
+                <label key={sort.id} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', gap: '0.5rem' }}>
+                  <input
+                    type="radio"
+                    name="sort-filter"
+                    value={sort.id}
+                    checked={selectedSortFilter === sort.id}
+                    onChange={(e) => setSelectedSortFilter(e.target.value)}
+                    style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                  />
+                  <span style={{ color: '#555', fontSize: '0.9rem' }}>{sort.label}</span>
+                </label>
+              ))}
+            </div>
+          </div>
         </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem' }}>
-          {filteredOpdrachten.map((opdracht) => (
-            <div
-              key={opdracht.id}
-              className="card round white"
-              style={{ padding: '1rem', cursor: 'pointer', position: 'relative' }}
-              onClick={() => openModal(opdracht)}
-            >
-              <h3>{opdracht.title}</h3>
-              <p>{opdracht.description.substring(0, 80)}...</p>
-              <p>Deadline: {new Date(opdracht.deadline).toLocaleDateString()}</p>
-              <p>Status: {opdracht.status}</p>
-              {opdracht.total_bid_count > 0 && (
-                <div style={{
-                  position: 'absolute',
-                  top: '10px',
-                  right: '10px',
-                  color: 'red',
-                  fontWeight: 'bold',
-                  fontSize: '14px'
-                }}>
-                  geboden
+        <div style={{ flex: 1, padding: '2rem', overflowY: 'auto' }}>
+          <div style={{ marginBottom: '2rem' }}>
+            <h1 style={{ margin: '0 0 0.5rem 0', color: '#333' }}>Opdrachten</h1>
+            <p style={{ color: '#999', margin: 0 }}>
+              {filteredOpdrachten.length} {filteredOpdrachten.length === 1 ? 'opdracht' : 'opdrachten'} gevonden
+            </p>
+          </div>
+
+          {loading && <p style={{ color: '#666' }}>Laden...</p>}
+          {error && <p style={{ color: 'red' }}>{error}</p>}
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.5rem' }}>
+            {filteredOpdrachten.map((opdracht) => (
+              <div
+                key={opdracht.id}
+                onClick={() => openModal(opdracht)}
+                style={{
+                  padding: '1.5rem',
+                  cursor: 'pointer',
+                  position: 'relative',
+                  backgroundColor: 'white',
+                  borderRadius: '10px',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                  transition: 'all 0.3s ease',
+                  border: '1px solid #f0f0f0',
+                  ':hover': {
+                    boxShadow: '0 8px 16px rgba(0,0,0,0.15)',
+                    transform: 'translateY(-2px)'
+                  }
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.boxShadow = '0 8px 16px rgba(0,0,0,0.15)';
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                }}
+              >
+                {opdracht.total_bid_count > 0 && (
+                  <div style={{
+                    position: 'absolute',
+                    top: '12px',
+                    right: '12px',
+                    backgroundColor: '#ff6b6b',
+                    color: 'white',
+                    padding: '0.35rem 0.65rem',
+                    borderRadius: '20px',
+                    fontWeight: 600,
+                    fontSize: '0.8rem'
+                  }}>
+                    {opdracht.total_bid_count} {opdracht.total_bid_count === 1 ? 'bod' : 'boden'}
+                  </div>
+                )}
+                
+                <div style={{ marginBottom: '1rem' }}>
+                  <h3 style={{ margin: '0 0 0.5rem 0', color: '#333', fontSize: '1.1rem', fontWeight: 600 }}>
+                    {opdracht.title}
+                  </h3>
+                  <p style={{ margin: 0, color: '#666', fontSize: '0.9rem', lineHeight: '1.4' }}>
+                    {opdracht.description.substring(0, 100)}...
+                  </p>
                 </div>
-              )}
+
+                <div style={{ 
+                  display: 'grid', 
+                  gridTemplateColumns: '1fr 1fr', 
+                  gap: '1rem', 
+                  marginBottom: '1rem',
+                  fontSize: '0.85rem'
+                }}>
+                  <div>
+                    <span style={{ color: '#999', display: 'block', marginBottom: '0.2rem' }}>Deadline</span>
+                    <span style={{ color: '#333', fontWeight: 500 }}>
+                      {new Date(opdracht.deadline).toLocaleDateString('nl-NL')}
+                    </span>
+                  </div>
+                  {opdracht.location_city && (
+                    <div>
+                      <span style={{ color: '#999', display: 'block', marginBottom: '0.2rem' }}>Locatie</span>
+                      <span style={{ color: '#333', fontWeight: 500 }}>
+                        {opdracht.location_city}
+                      </span>
+                    </div>
+                  )}
+                </div>
+
+                <div style={{ 
+                  paddingTop: '1rem', 
+                  borderTop: '1px solid #f0f0f0',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
+                }}>
+                  <span style={{
+                    display: 'inline-block',
+                    backgroundColor: '#e3f2fd',
+                    color: '#1976d2',
+                    padding: '0.35rem 0.65rem',
+                    borderRadius: '4px',
+                    fontSize: '0.8rem',
+                    fontWeight: 500
+                  }}>
+                    {opdracht.status}
+                  </span>
+                  <span style={{ color: '#1976d2', fontSize: '0.9rem', fontWeight: 500 }}>
+                    Meer info →
+                  </span>
+                </div>
+              </div>
+            ))}
+          </div>
+
+          {filteredOpdrachten.length === 0 && !loading && (
+            <div style={{ textAlign: 'center', padding: '3rem', color: '#999' }}>
+              <p style={{ fontSize: '1.1rem' }}>Geen opdrachten gevonden</p>
             </div>
-          ))}
+          )}
         </div>
       </div>
 

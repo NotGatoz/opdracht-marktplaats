@@ -21,6 +21,8 @@ export default function MijnOpdrachtenPage() {
   const [uploadedPdfs, setUploadedPdfs] = useState([]);
   const [imagePreviews, setImagePreviews] = useState([]);
   const [pdfNames, setPdfNames] = useState([]);
+  const [selectedFilter, setSelectedFilter] = useState('');
+  const [searchQuery, setSearchQuery] = useState('');
 
   useEffect(() => {
     const fetchUser = () => {
@@ -321,7 +323,6 @@ export default function MijnOpdrachtenPage() {
       const data = await res.json();
       if (!res.ok) throw new Error(data.error || 'Fout bij voltooien opdracht');
       
-      // Refresh opdrachten list
       const fetchOpdrachten = async () => {
         try {
           const res = await fetch(`/api/opdracht/mijn-opdrachten?userId=${user.id}`);
@@ -343,65 +344,226 @@ export default function MijnOpdrachtenPage() {
     }
   };
 
+  const filteredOpdrachten = opdrachten.filter((opdracht) => {
+    const matchesSearch = searchQuery === '' ||
+      opdracht.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      opdracht.description.toLowerCase().includes(searchQuery.toLowerCase());
+    if (!matchesSearch) return false;
+
+    if (!selectedFilter) return true;
+
+    const bidCount = Number(opdracht.total_bid_count) || 0;
+
+    if (selectedFilter === 'nog niet geboden') return bidCount === 0;
+    if (selectedFilter === 'geboden') return bidCount > 0;
+    if (selectedFilter === 'aangenomen') return opdracht.status === 'aangenomen';
+    if (selectedFilter === 'voltooid') return opdracht.status === 'voltooid';
+
+    return true;
+  });
+
   return (
     <div className="theme-l5" style={{ display: 'flex', flexDirection: 'column', minHeight: '100vh' }}>
       <Navbar />
 
-      <div style={{ flex: 1, padding: '2rem', marginTop: '80px' }}>
-        <h1>Mijn Geplaatste Opdrachten</h1>
-        {loading && <p>Laden...</p>}
-        {error && <p style={{ color: 'red' }}>{error}</p>}
+      <div style={{ flex: 1, display: 'flex', marginTop: '80px' }}>
+        <div style={{ width: '250px', backgroundColor: '#f8f9fa', borderRight: '1px solid #e0e0e0', padding: '2rem', minHeight: '100vh', overflowY: 'auto' }}>
+          <h3 style={{ marginBottom: '1.5rem', color: '#333', fontSize: '1.1rem', fontWeight: 600 }}>Zoeken en Filteren</h3>
+          
+          <div style={{ marginBottom: '2rem' }}>
+            <label style={{ display: 'block', marginBottom: '0.5rem', fontWeight: 500, color: '#555', fontSize: '0.9rem' }}>Zoeken</label>
+            <input
+              type="text"
+              placeholder="Zoek opdrachten..."
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+              style={{ 
+                padding: '0.7rem', 
+                width: '100%', 
+                borderRadius: '6px', 
+                border: '1px solid #ddd', 
+                fontSize: '0.9rem',
+                boxSizing: 'border-box'
+              }}
+            />
+          </div>
 
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(250px, 1fr))', gap: '1rem' }}>
-          {opdrachten.map((opdracht) => (
-            <div
-              key={opdracht.id}
-              className="card round white"
-              style={{ padding: '1rem', cursor: 'pointer', position: 'relative' }}
-              onClick={() => openModal(opdracht)}
-            >
-              <div style={{ position: 'absolute', top: '10px', right: '10px', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    openEditModal(opdracht);
-                  }}
-                  style={{
-                    background: '#007bff',
-                    color: 'white',
-                    border: 'none',
-                    padding: '0.5rem 1rem',
+          <h4 style={{ marginBottom: '1rem', color: '#333', fontSize: '0.95rem', fontWeight: 600 }}>Filteren</h4>
+          
+          <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem' }}>
+            <label style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', gap: '0.5rem' }}>
+              <input
+                type="radio"
+                name="opdracht-filter"
+                value=""
+                checked={selectedFilter === ''}
+                onChange={(e) => setSelectedFilter(e.target.value)}
+                style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+              />
+              <span style={{ color: '#555', fontSize: '0.9rem' }}>Alle opdrachten</span>
+            </label>
+            {[
+              { id: 'nog niet geboden', label: 'Nog niet geboden' },
+              { id: 'geboden', label: 'Geboden' },
+              { id: 'aangenomen', label: 'Aangenomen' },
+              { id: 'voltooid', label: 'Voltooid' },
+            ].map((filter) => (
+              <label key={filter.id} style={{ display: 'flex', alignItems: 'center', cursor: 'pointer', gap: '0.5rem' }}>
+                <input
+                  type="radio"
+                  name="opdracht-filter"
+                  value={filter.id}
+                  checked={selectedFilter === filter.id}
+                  onChange={(e) => setSelectedFilter(e.target.value)}
+                  style={{ width: '18px', height: '18px', cursor: 'pointer' }}
+                />
+                <span style={{ color: '#555', fontSize: '0.9rem' }}>{filter.label}</span>
+              </label>
+            ))}
+          </div>
+        </div>
+
+        <div style={{ flex: 1, padding: '2rem', overflowY: 'auto' }}>
+          <div style={{ marginBottom: '2rem' }}>
+            <h1 style={{ margin: '0 0 0.5rem 0', color: '#333' }}>Mijn Geplaatste Opdrachten</h1>
+            <p style={{ color: '#999', margin: 0 }}>
+              {filteredOpdrachten.length} {filteredOpdrachten.length === 1 ? 'opdracht' : 'opdrachten'} gevonden
+            </p>
+          </div>
+
+          {loading && <p style={{ color: '#666' }}>Laden...</p>}
+          {error && <p style={{ color: 'red' }}>{error}</p>}
+
+          <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '1.5rem' }}>
+            {filteredOpdrachten.map((opdracht) => (
+              <div
+                key={opdracht.id}
+                onClick={() => openModal(opdracht)}
+                style={{
+                  padding: '1.5rem',
+                  cursor: 'pointer',
+                  position: 'relative',
+                  backgroundColor: 'white',
+                  borderRadius: '10px',
+                  boxShadow: '0 2px 8px rgba(0,0,0,0.1)',
+                  transition: 'all 0.3s ease',
+                  border: '1px solid #f0f0f0',
+                }}
+                onMouseEnter={(e) => {
+                  e.currentTarget.style.boxShadow = '0 8px 16px rgba(0,0,0,0.15)';
+                  e.currentTarget.style.transform = 'translateY(-2px)';
+                }}
+                onMouseLeave={(e) => {
+                  e.currentTarget.style.boxShadow = '0 2px 8px rgba(0,0,0,0.1)';
+                  e.currentTarget.style.transform = 'translateY(0)';
+                }}
+              >
+                <div style={{ position: 'absolute', top: '12px', right: '12px', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      openEditModal(opdracht);
+                    }}
+                    style={{
+                      background: '#007bff',
+                      color: 'white',
+                      border: 'none',
+                      padding: '0.5rem 1rem',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      fontSize: '0.85rem',
+                      fontWeight: 500,
+                      transition: 'background 0.2s'
+                    }}
+                    onMouseEnter={(e) => e.target.style.background = '#0056b3'}
+                    onMouseLeave={(e) => e.target.style.background = '#007bff'}
+                  >
+                    Bewerken
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      setDeleteModal(opdracht);
+                    }}
+                    style={{
+                      background: '#dc3545',
+                      color: 'white',
+                      border: 'none',
+                      padding: '0.5rem 1rem',
+                      borderRadius: '6px',
+                      cursor: 'pointer',
+                      fontSize: '0.85rem',
+                      fontWeight: 500,
+                      transition: 'background 0.2s'
+                    }}
+                    onMouseEnter={(e) => e.target.style.background = '#c82333'}
+                    onMouseLeave={(e) => e.target.style.background = '#dc3545'}
+                  >
+                    Verwijderen
+                  </button>
+                </div>
+
+                <div style={{ marginBottom: '1rem', paddingRight: '120px' }}>
+                  <h3 style={{ margin: '0 0 0.5rem 0', color: '#333', fontSize: '1.1rem', fontWeight: 600 }}>
+                    {opdracht.title}
+                  </h3>
+                  <p style={{ margin: 0, color: '#666', fontSize: '0.9rem', lineHeight: '1.4' }}>
+                    {opdracht.description.substring(0, 100)}...
+                  </p>
+                </div>
+
+                <div style={{ 
+                  display: 'grid', 
+                  gridTemplateColumns: '1fr 1fr', 
+                  gap: '1rem', 
+                  marginBottom: '1rem',
+                  fontSize: '0.85rem'
+                }}>
+                  <div>
+                    <span style={{ color: '#999', display: 'block', marginBottom: '0.2rem' }}>Deadline</span>
+                    <span style={{ color: '#333', fontWeight: 500 }}>
+                      {new Date(opdracht.deadline).toLocaleDateString('nl-NL')}
+                    </span>
+                  </div>
+                  <div>
+                    <span style={{ color: '#999', display: 'block', marginBottom: '0.2rem' }}>Biedingen</span>
+                    <span style={{ color: '#333', fontWeight: 500 }}>
+                      {opdracht.total_bid_count || 0} {opdracht.total_bid_count === 1 ? 'bod' : 'boden'}
+                    </span>
+                  </div>
+                </div>
+
+                <div style={{ 
+                  paddingTop: '1rem', 
+                  borderTop: '1px solid #f0f0f0',
+                  display: 'flex',
+                  justifyContent: 'space-between',
+                  alignItems: 'center'
+                }}>
+                  <span style={{
+                    display: 'inline-block',
+                    backgroundColor: opdracht.status === 'aangenomen' ? '#d4edda' : opdracht.status === 'voltooid' ? '#cce5ff' : '#fff3cd',
+                    color: opdracht.status === 'aangenomen' ? '#155724' : opdracht.status === 'voltooid' ? '#004085' : '#856404',
+                    padding: '0.35rem 0.65rem',
                     borderRadius: '4px',
-                    cursor: 'pointer',
-                    fontSize: '0.9rem',
-                  }}
-                >
-                  Bewerken
-                </button>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    setDeleteModal(opdracht);
-                  }}
-                  style={{
-                    background: 'red',
-                    color: 'white',
-                    border: 'none',
-                    padding: '0.5rem 1rem',
-                    borderRadius: '4px',
-                    cursor: 'pointer',
-                    fontSize: '0.9rem',
-                  }}
-                >
-                  Verwijderen
-                </button>
+                    fontSize: '0.8rem',
+                    fontWeight: 500
+                  }}>
+                    {opdracht.status}
+                  </span>
+                  <span style={{ color: '#1976d2', fontSize: '0.9rem', fontWeight: 500 }}>
+                    Meer info →
+                  </span>
+                </div>
               </div>
-              <h3>{opdracht.title}</h3>
-              <p>{opdracht.description.substring(0, 80)}...</p>
-              <p>Deadline: {new Date(opdracht.deadline).toLocaleDateString()}</p>
-              <p>Status: <span style={{ color: opdracht.status === 'aangenomen' ? 'green' : 'inherit' }}>{opdracht.status}</span></p>
+            ))}
+          </div>
+
+          {filteredOpdrachten.length === 0 && !loading && (
+            <div style={{ textAlign: 'center', padding: '3rem', color: '#999' }}>
+              <p style={{ fontSize: '1.1rem' }}>Geen opdrachten gevonden</p>
             </div>
-          ))}
+          )}
         </div>
       </div>
 
