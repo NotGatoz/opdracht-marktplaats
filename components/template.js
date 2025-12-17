@@ -195,6 +195,13 @@ export function Navbar() {
             <i className="fa fa-list"></i>Opdrachten
           </Link>
 
+          <Link
+            href="/opdracht/aangenomen-opdrachten"
+            style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', padding: '0.6rem 1rem', borderRadius: '8px', color: 'white', textDecoration: 'none', fontSize: '0.95rem', fontWeight: 500, transition: 'var(--transition)', backgroundColor: 'rgba(255, 255, 255, 0.1)' }} onMouseEnter={(e) => e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.2)'} onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'rgba(255, 255, 255, 0.1)'}
+          >
+            <i className="fa fa-check-circle"></i>Geboden Opdrachten
+          </Link>
+
           {user?.is_admin && (
             <Link
               href="/admin/panel"

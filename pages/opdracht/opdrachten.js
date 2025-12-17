@@ -184,6 +184,8 @@ export default function OpdrachtenPage() {
 
   const filteredOpdrachten = opdrachten
     .filter((opdracht) => {
+      if (opdracht.status === 'aangenomen') return false;
+
       const matchesSearch = searchQuery === '' ||
         opdracht.title.toLowerCase().includes(searchQuery.toLowerCase()) ||
         opdracht.description.toLowerCase().includes(searchQuery.toLowerCase());
